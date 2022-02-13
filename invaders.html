@@ -1,0 +1,984 @@
+<!--
+  Andromeda Invaders 0.1.0
+  Copyright (c) 2022 Susam Pal
+  Source: https://github.com/susam/invaders
+  License: MIT
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Andromeda Invaders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+      body {
+        background: #111;
+        margin: 0;
+      }
+      canvas {
+        background: #000;
+        display: block;
+        margin: 0 auto;
+        box-sizing: border-box;
+        border: 1px solid #333;
+      }
+      div {
+        text-align: center;
+      }
+      button {
+        background: #000;
+        color: #999;
+        font-size: 16px;
+        font-weight: bold;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
+    </style>
+    <script>
+      'use strict'
+
+      // Metadata for info screen.
+      const NAME = 'Andromeda Invaders'
+      const VERSION = '0.1.0'
+      const COPYRIGHT = 'Copyright (c) 2022 Susam Pal'
+      const SOURCE_URL = 'https://github.com/susam/invaders'
+
+      // Lifecycle states.
+      const INITIALIZED = 'initialized'
+      const PLAYING = 'playing'
+      const PAUSED = 'paused'
+      const ENDED = 'ended'
+      const INFO = 'info'
+
+      const LOGGING_ENABLED = false
+
+      // Graphics dimensions.
+      const PADDING = 10
+      const CANVAS_WIDTH = 640
+      const CANVAS_HEIGHT = 480
+
+      const SCORE_Y = PADDING + 20
+      const SCORE_PADDING = 10
+
+      const PLAYER_WIDTH = 50
+      const PLAYER_HEIGHT = 30
+      const PLAYER_HEAD_SIZE = 10
+      const PLAYER_Y = CANVAS_HEIGHT - PADDING - PLAYER_HEIGHT
+      const PLAYER_MOVE_STEP = 5
+
+      const PULSE_WIDTH = 6
+      const PULSE_HEIGHT = 30
+      const PULSE_X_OFFSET = (PLAYER_WIDTH - PULSE_WIDTH) / 2
+      const PULSE_Y_OFFSET = 0
+      const PULSE_MOVE_STEP = 10
+
+      const SHIP_WIDTH = 50
+      const SHIP_HEIGHT = 20
+      const SHIP_ROOF_WIDTH = 30
+      const SHIP_ROOF_HEIGHT = 5
+      const SHIP_ROOF_OFFSET = (SHIP_WIDTH - SHIP_ROOF_WIDTH) / 2
+      const SHIP_BODY_HEIGHT = SHIP_HEIGHT - 2 * SHIP_ROOF_HEIGHT
+      const SHIP_LANE_HEIGHT = 35
+
+      const CANON_WIDTH = 6
+      const CANON_HEIGHT = 6
+      const CANON_X_OFFSET = (SHIP_WIDTH - CANON_WIDTH) / 2
+      const CANON_Y_OFFSET = SHIP_HEIGHT - CANON_HEIGHT
+
+      // Color palettes.
+      const SHIP_COLORS = ['#f60', '#c30', '#900']
+      const PLAYER_COLORS = ['#0c0', '#390', '#660']
+
+      // Audio parameters.
+      const BACKGROUND_VOLUME = 0.8
+      const HIT_VOLUME = 1.0
+      const HIT_DURATION = 0.125
+
+      // C major scale notes.
+      const C2 = 65.41
+      const D2 = 73.42
+      const E2 = 82.41
+      const F2 = 87.31
+      const G2 = 98.00
+      const A2 = 110.00
+      const B2 = 123.47
+      const C3 = 130.81
+      const E3 = 164.81
+      const F3 = 174.61
+      const G3 = 196.00
+      const A3 = 220.00
+      const B3 = 246.94
+      const C4 = 261.63
+      const D4 = 293.66
+      const F4 = 349.23
+      const B4 = 493.88
+
+      // Time intervals.
+      const REFRESH_INTERVAL = 20
+      const ACTION_REPEAT_INTERVAL = 20
+
+      // Initialization time for logging purpose.
+      let initTime
+
+      // Graphics and audio contexts.
+      let canvas
+      let gCtx
+      let aCtx
+      let gTimer
+      let aTimer
+      let scaledCanvasWidth
+      let scaledCanvasHeight
+
+      // HTML buttons.
+      let buttonsPlay
+      let buttonsMore
+      let buttonLeft
+      let buttonRight
+      let buttonEnter
+      let buttonPause
+      let buttonMute
+      let buttonList
+
+      // Game states.
+      let shipsAlive
+      let state
+      let level
+
+      // User interface states.
+      let leftTimer
+      let rightTimer
+      let leftOn = false
+      let rightOn = false
+      let muted = false
+
+      // Game objects visible on screen.
+      const player = {}
+      const pulse = {}
+      let ships
+      let canons
+
+      // Utility functions.
+      function log () {
+        if (LOGGING_ENABLED) {
+          const args = Array.prototype.slice.call(arguments)
+          args.unshift('time: ' + ((Date.now() - initTime) / 1000) +
+                       '; state: ' + state +
+                       '; level: ' + level +
+                       '; score: ' + player.score +
+                       '; health: ' + player.health +
+                       '; ships: ' + shipsAlive +
+                       ';')
+          console.log.apply(console, args)
+        }
+      }
+
+      function random (min, max) {
+        return min + Math.floor(Math.random() * (max - min + 1))
+      }
+
+      function bounded (x, min, max) {
+        return Math.max(Math.min(x, max), min)
+      }
+
+      function init () {
+        state = INITIALIZED
+        initTime = Date.now()
+        initGraphics()
+        initButtons()
+        initAudio()
+        initEventListeners()
+        resizeUI()
+        resetGame()
+        drawGame()
+        log('initialized canvas')
+      }
+
+      function initGraphics () {
+        canvas = document.getElementById('canvas')
+        gCtx = canvas.getContext('2d')
+        canvas.width = CANVAS_WIDTH
+        canvas.height = CANVAS_HEIGHT
+      }
+
+      function initButtons () {
+        buttonsPlay = document.getElementById('play')
+        buttonsMore = document.getElementById('more')
+        buttonLeft = document.getElementById('left')
+        buttonRight = document.getElementById('right')
+        buttonEnter = document.getElementById('enter')
+        buttonPause = document.getElementById('pause')
+        buttonMute = document.getElementById('mute')
+        buttonList = [
+          buttonLeft, buttonRight, buttonEnter, buttonPause, buttonMute
+        ]
+      }
+
+      function initAudio () {
+        if (typeof window.AudioContext === 'undefined') {
+          window.AudioContext = window.webkitAudioContext
+        }
+        aCtx = new window.AudioContext()
+      }
+
+      function initEventListeners () {
+        window.addEventListener('resize', resizeUI)
+
+        document.addEventListener('keydown', readKeyDown)
+        document.addEventListener('keyup', readKeyUp)
+
+        buttonLeft.addEventListener('mousedown', startLeft)
+        buttonLeft.addEventListener('mouseup', stopLeft)
+        buttonLeft.addEventListener('touchstart', startLeft)
+        buttonLeft.addEventListener('touchend', stopLeft)
+
+        buttonRight.addEventListener('mousedown', startRight)
+        buttonRight.addEventListener('mouseup', stopRight)
+        buttonRight.addEventListener('touchstart', startRight)
+        buttonRight.addEventListener('touchend', stopRight)
+
+        buttonEnter.addEventListener('click', actionEnter)
+        buttonEnter.addEventListener('touchstart', actionEnter)
+
+        buttonPause.addEventListener('click', actionPause)
+        buttonPause.addEventListener('touchstart', actionPause)
+
+        buttonMute.addEventListener('click', actionMute)
+        buttonMute.addEventListener('touchstart', actionMute)
+      }
+
+      function resizeUI () {
+        document.body.style.padding = PADDING + 'px'
+        if (window.innerWidth > window.innerHeight) {
+          resizeElements('inline-block', [5], 40, 10)
+          log('resized UI for wide screen')
+        } else {
+          resizeElements('block', [2, 3], 60, 30)
+          log('resized UI for tall screen')
+        }
+      }
+
+      function resizeElements (buttonsDivStyle, buttonGroups,
+        buttonHeight, buttonPadding) {
+        const buttonRows = buttonGroups.length
+        const buttonsHeight = buttonRows * (buttonPadding + buttonHeight)
+        const availableHeight = window.innerHeight - 2 * PADDING - buttonsHeight
+        const availableWidth = window.innerWidth - 2 * PADDING
+        buttonsPlay.style.display = buttonsDivStyle
+        buttonsMore.style.display = buttonsDivStyle
+        scaledCanvasHeight = Math.min(availableHeight, availableWidth * 3 / 4)
+        scaledCanvasWidth = scaledCanvasHeight * 4 / 3
+        canvas.style.width = scaledCanvasWidth + 'px'
+        canvas.style.height = scaledCanvasHeight + 'px'
+        let start = 0
+        for (let i = 0; i < buttonGroups.length; i++) {
+          const len = buttonGroups[i]
+          resizeButtons(start, len, buttonHeight, buttonPadding)
+          start += len
+        }
+      }
+
+      function resizeButtons (start, len, height, padding) {
+        const width = (scaledCanvasWidth - (len - 1) * padding) / len
+        for (let i = start; i < start + len; i++) {
+          const button = buttonList[i]
+          button.style.height = height + 'px'
+          button.style.width = width + 'px'
+          button.style.marginTop = padding + 'px'
+          if (i === start + len - 1) {
+            button.style.marginRight = '0'
+          } else {
+            button.style.marginRight = padding + 'px'
+          }
+        }
+      }
+
+      function resetGame () {
+        player.score = 0
+        level = 1
+        resetPlayer()
+        resetPulse()
+        resetShips()
+        resetCanons()
+        log('reset game')
+      }
+
+      function newGameLevel () {
+        if (level === 1000) {
+          level = 1
+        } else {
+          level++
+        }
+        resetPulse()
+        resetShips()
+        resetCanons()
+        log('created game level', level)
+      }
+
+      function startGame () {
+        state = PLAYING
+        music()
+        animate()
+        log('started game')
+      }
+
+      function stopGame () {
+        state = ENDED
+        clearTimeout(gTimer)
+        clearTimeout(aTimer)
+        log('stopped game')
+      }
+
+      function pauseGame () {
+        state = PAUSED
+        clearTimeout(gTimer)
+        clearTimeout(aTimer)
+        log('paused game')
+      }
+
+      function restartGame () {
+        if (state === PLAYING) {
+          stopGame()
+        }
+        state = INITIALIZED
+        resetGame()
+        drawGame()
+        log('restarted game')
+      }
+
+      function shipColor (ship) {
+        return SHIP_COLORS[SHIP_COLORS.length - ship.health]
+      }
+
+      function playerColor () {
+        return PLAYER_COLORS[PLAYER_COLORS.length - player.health]
+      }
+
+      function resetPlayer () {
+        player.x = PADDING
+        player.y = PLAYER_Y
+        player.health = PLAYER_COLORS.length
+        player.hit = false
+        player.repairySinceScore = 0
+        log('reset player; x: ' + player.x + '; y: ' + player.y)
+      }
+
+      function resetPulse () {
+        if (player.health === 0) {
+          return
+        }
+        pulse.x = player.x + PULSE_X_OFFSET
+        pulse.y = player.y + PULSE_Y_OFFSET
+        pulse.color = playerColor()
+        pulse.live = true
+        log('reset pulse')
+      }
+
+      function resetShips () {
+        const speed = bounded(level, 2, 20)
+        shipsAlive = (level <= 2) ? (3 * level) : 10
+        ships = []
+        for (let i = 0; i < shipsAlive; i++) {
+          const ship = {}
+          ship.x = random(PADDING, CANVAS_WIDTH - PADDING - SHIP_WIDTH)
+          ship.y = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i
+          ship.direction = random(0, 1) === 0 ? -1 : 1
+          ship.health = SHIP_COLORS.length
+          ship.speed = speed
+          ship.repaired = 0
+          ship.hit = false
+          ships.push(ship)
+          log('ship ' + i + '; x: ' + ship.x + '; y: ' + ship.y +
+              '; height: ' + SHIP_HEIGHT)
+        }
+        log('reset', shipsAlive, 'ships with speed', speed)
+      }
+
+      function resetCanons () {
+        canons = []
+        for (let i = 0; i < shipsAlive; i++) {
+          const canon = {}
+          resetCanon(canon, ships[i])
+          canons.push(canon)
+        }
+        log('reset canons')
+      }
+
+      function resetCanon (canon, ship) {
+        const minSpeed = bounded(level - 2, 1, 10)
+        const maxSpeed = bounded(level + 1, 4, 15)
+        if (ship.health > 0) {
+          repairShip(ship)
+          canon.x = ship.x + CANON_X_OFFSET
+          canon.y = ship.y + CANON_Y_OFFSET
+          canon.color = shipColor(ship)
+          canon.speed = random(minSpeed, maxSpeed)
+          canon.hit = false
+          canon.live = true
+        } else {
+          canon.live = false
+        }
+      }
+
+      function repairPlayer () {
+        const repairy = player.score - player.repairySinceScore
+        if (player.health > 0 && player.health < PLAYER_COLORS.length &&
+            repairy >= 100) {
+          player.health++
+          log('increased player health; repairy =', player.score, '-',
+            player.repairySinceScore, '=', repairy)
+          player.repairySinceScore = player.score
+        }
+      }
+
+      function repairShip (ship) {
+        if (ship.health > 0 && ship.health < SHIP_COLORS.length) {
+          ship.repaired++
+        }
+        if (ship.repaired === 10) {
+          ship.health++
+          ship.repaired = 0
+        }
+      }
+
+      function animate () {
+        processShipHits()
+        processCanonHits()
+        processPlayerHit()
+        if (shipsAlive === 0) {
+          newGameLevel()
+        }
+        repairPlayer()
+        movePulse()
+        moveShips()
+        moveCanons()
+        checkShipHits()
+        checkCanonHits()
+        checkPlayerHit()
+        drawGame()
+        if (player.health === 0) {
+          stopGame()
+          return
+        }
+        gTimer = setTimeout(animate, REFRESH_INTERVAL)
+      }
+
+      function movePulse () {
+        if (!pulse.live) {
+          resetPulse()
+        } else if (pulse.y < -PULSE_HEIGHT) {
+          pulse.live = false
+        } else {
+          pulse.y -= PULSE_MOVE_STEP
+        }
+        if (PLAYER_Y - pulse.y <= 2 * PULSE_MOVE_STEP) {
+          pulse.x = player.x + PULSE_X_OFFSET
+        }
+      }
+
+      function moveShips () {
+        for (let i = 0; i < ships.length; i++) {
+          const ship = ships[i]
+          ship.x += ship.direction * ship.speed
+          if (ship.x < PADDING) {
+            ship.x = PADDING
+            ship.direction *= -1
+          } else if (ship.x >= CANVAS_WIDTH - PADDING - SHIP_WIDTH) {
+            ship.x = CANVAS_WIDTH - PADDING - SHIP_WIDTH
+            ship.direction *= -1
+          }
+          const minY = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i
+          const maxY = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i + 10
+          ship.y += random(-1, 1)
+          ship.y = bounded(ship.y, minY, maxY)
+          if (random(1, 100) === 1) {
+            ship.direction *= -1
+          }
+        }
+      }
+
+      function moveCanons () {
+        for (let i = 0; i < canons.length; i++) {
+          const canon = canons[i]
+          const ship = ships[i]
+          canon.y += canon.speed
+          if (!canon.live) {
+            resetCanon(canon, ship)
+          } else if (canon.y > CANVAS_HEIGHT) {
+            canon.live = false
+          }
+          if (canon.y - ship.y <= 5 * CANON_HEIGHT) {
+            canon.x = ship.x + CANON_X_OFFSET
+          }
+        }
+      }
+
+      function drawBackground () {
+        gCtx.fillStyle = '#000'
+        gCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      }
+
+      function drawGame () {
+        drawBackground()
+        drawScore()
+        drawPlayer()
+        drawShips()
+        drawCanons()
+        drawPulse()
+      }
+
+      let urlMinY
+      let urlMaxY
+
+      function drawInfo () {
+        state = INFO
+        drawBackground()
+        gCtx.font = '18px monospace'
+        gCtx.fillStyle = PLAYER_COLORS[0]
+        gCtx.strokeStyle = PLAYER_COLORS[0]
+
+        const testString = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+                           'abcdefghijklmnopqrstuvwxyz' +
+                           '123567890'
+        const testMetrics = gCtx.measureText(testString)
+        const ascent = testMetrics.actualBoundingBoxAscent
+        const descent = testMetrics.actualBoundingBoxDescent
+        const height = ascent + descent
+
+        let textY = 180
+        writeLine(NAME + ' v' + VERSION, textY, false)
+        textY += 2 * height
+        writeLine(COPYRIGHT, textY, false)
+        textY += 2 * height
+        writeLine('Licensed under the terms of the MIT License', textY, false)
+        textY += 2 * height
+        writeLine(SOURCE_URL, textY, true)
+        urlMinY = textY - ascent - 10
+        urlMaxY = textY + descent + 10
+      }
+
+      function infoCursor (e) {
+        const cursorY = e.offsetY * CANVAS_HEIGHT / scaledCanvasHeight
+        if (cursorY >= urlMinY && cursorY <= urlMaxY) {
+          canvas.style.cursor = 'pointer'
+        } else {
+          canvas.style.cursor = 'auto'
+        }
+      }
+
+      function infoClick (e) {
+        const cursorY = e.offsetY * CANVAS_HEIGHT / scaledCanvasHeight
+        if (cursorY >= urlMinY && cursorY <= urlMaxY) {
+          window.location = SOURCE_URL
+        }
+      }
+
+      function enableClickableInfo () {
+        canvas.addEventListener('mousemove', infoCursor)
+        canvas.addEventListener('click', infoClick)
+      }
+
+      function disableClickableInfo () {
+        canvas.removeEventListener('mousemove', infoCursor)
+        canvas.removeEventListener('click', infoClick)
+      }
+
+      function writeLine (text, textY, underline) {
+        const textMetrics = gCtx.measureText(text)
+        const ascent = textMetrics.actualBoundingBoxAscent
+        const descent = textMetrics.actualBoundingBoxDescent
+        const height = ascent + descent
+        const width = textMetrics.width
+        const textX = Math.round((CANVAS_WIDTH - width) / 2)
+        gCtx.fillText(text, textX, textY)
+        if (underline) {
+          gCtx.moveTo(textX, textY + descent)
+          gCtx.lineTo(textX + width, textY + descent)
+          gCtx.stroke()
+        }
+        return Math.ceil(textY + height * 2)
+      }
+
+      function drawScore () {
+        const text = player.score + ' (L' + level + ')'
+        gCtx.font = '16px monospace'
+        gCtx.fillStyle = PLAYER_COLORS[0]
+        gCtx.fillText(text, PADDING, SCORE_Y)
+      }
+
+      function drawShips () {
+        for (let i = 0; i < ships.length; i++) {
+          const ship = ships[i]
+          if (ship.health === 0) {
+            continue
+          }
+          gCtx.fillStyle = shipColor(ship)
+          gCtx.fillRect(
+            ship.x + SHIP_ROOF_OFFSET,
+            ship.y,
+            SHIP_ROOF_WIDTH,
+            SHIP_ROOF_HEIGHT)
+          gCtx.fillRect(
+            ship.x,
+            ship.y + SHIP_ROOF_HEIGHT,
+            SHIP_WIDTH,
+            SHIP_BODY_HEIGHT)
+          gCtx.fillRect(
+            ship.x + SHIP_ROOF_OFFSET,
+            ship.y + SHIP_ROOF_HEIGHT + SHIP_BODY_HEIGHT,
+            SHIP_ROOF_WIDTH,
+            SHIP_ROOF_HEIGHT)
+        }
+      }
+
+      function drawCanons () {
+        for (let i = 0; i < canons.length; i++) {
+          const canon = canons[i]
+          if (!canon.live) {
+            continue
+          }
+          gCtx.fillStyle = canon.color
+          gCtx.fillRect(canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT)
+        }
+      }
+
+      function drawPlayer () {
+        if (player.health === 0) {
+          return
+        }
+        gCtx.fillStyle = playerColor()
+        gCtx.fillRect(
+          player.x + 2 * PLAYER_HEAD_SIZE,
+          player.y,
+          PLAYER_HEAD_SIZE,
+          PLAYER_HEAD_SIZE)
+        gCtx.fillRect(
+          player.x + PLAYER_HEAD_SIZE,
+          player.y + PLAYER_HEAD_SIZE,
+          PLAYER_WIDTH - 2 * PLAYER_HEAD_SIZE,
+          PLAYER_HEAD_SIZE)
+        gCtx.fillRect(
+          player.x,
+          player.y + 2 * PLAYER_HEAD_SIZE,
+          PLAYER_WIDTH,
+          PLAYER_HEAD_SIZE)
+      }
+
+      function drawPulse () {
+        if (!pulse.live) {
+          return
+        }
+        gCtx.fillStyle = pulse.color
+        gCtx.fillRect(pulse.x, pulse.y, 4, 30)
+      }
+
+      function music () {
+        const chords = [
+          [A2, E2, C3], // A minor
+          [G2, B2, E3], // E minor
+          [D2, F2, A3], // D minor
+          [B2, D2, G3] // G major
+        ]
+        const interval = 1 / bounded(level, 2, 12)
+        if (aCtx.state === 'suspended') {
+          aCtx.resume()
+        }
+        playChordProgression(chords, interval, BACKGROUND_VOLUME)
+        aTimer = setTimeout(music, chords.length * interval * 1000)
+      }
+
+      function playChordProgression (chords, duration, volume) {
+        for (let i = 0; i < chords.length; i++) {
+          playChord(chords[i], i * duration, duration, volume)
+        }
+      }
+
+      function playChord (frequencies, delay, duration, volume) {
+        const gain = aCtx.createGain()
+        const timeConstant = duration / 3
+        const startTime = aCtx.currentTime + delay
+        const stopTime = startTime + 10 * timeConstant
+        gain.connect(aCtx.destination)
+        for (let i = 0; i < frequencies.length; i++) {
+          const oscillator = aCtx.createOscillator()
+          const scaledVolume = muted ? 0 : volume / frequencies.length
+          oscillator.frequency.value = frequencies[i]
+          gain.gain.setValueAtTime(scaledVolume, startTime)
+          gain.gain.setTargetAtTime(0, startTime, timeConstant)
+          oscillator.connect(gain)
+          oscillator.start(startTime)
+          oscillator.stop(stopTime)
+          setTimeout(function () {
+            oscillator.disconnect()
+            gain.disconnect()
+          }, (stopTime + 1) * 1000)
+        }
+      }
+
+      function overlap (x1, y1, w1, h1, x2, y2, w2, h2) {
+        return x1 + w1 > x2 && x1 < x2 + w2 &&
+               y1 + h1 > y2 && y1 < y2 + h2
+      }
+
+      function checkShipHits () {
+        for (let i = 0; i < ships.length; i++) {
+          const ship = ships[i]
+          if (ship.health === 0) {
+            continue
+          }
+          const hitBetweenRoofs = overlap(
+            pulse.x, pulse.y, PULSE_WIDTH, PULSE_HEIGHT,
+            ship.x + SHIP_ROOF_OFFSET, ship.y, SHIP_ROOF_WIDTH, SHIP_HEIGHT)
+          const hitBetweenWings = overlap(
+            pulse.x, pulse.y, PULSE_WIDTH, PULSE_HEIGHT,
+            ship.x, ship.y + SHIP_ROOF_HEIGHT, SHIP_WIDTH, SHIP_BODY_HEIGHT)
+          if (hitBetweenRoofs || hitBetweenWings) {
+            // F major
+            playChord([F2, C3, F3, A3, F4], 0, HIT_DURATION, HIT_VOLUME)
+            ship.hit = true
+            log('ship', i, 'is hit')
+          }
+        }
+      }
+
+      function checkCanonHits () {
+        for (let i = 0; i < canons.length; i++) {
+          const canon = canons[i]
+          if (!canon.live) {
+            continue
+          }
+          const hit = overlap(
+            pulse.x, pulse.y, PULSE_WIDTH, PULSE_HEIGHT,
+            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT)
+          if (hit) {
+            // C major
+            playChord([C2, C3, E3, G3, C4], 0, HIT_DURATION, HIT_VOLUME)
+            canon.hit = true
+            log('canon', i, 'is hit')
+          }
+        }
+      }
+
+      function checkPlayerHit () {
+        for (let i = 0; i < canons.length; i++) {
+          const canon = canons[i]
+          if (!canon.live) {
+            continue
+          }
+          const headHit = overlap(
+            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT,
+            player.x + 2 * PLAYER_HEAD_SIZE,
+            player.y,
+            PLAYER_HEAD_SIZE,
+            PLAYER_HEAD_SIZE)
+          const bodyHit = overlap(
+            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT,
+            player.x + PLAYER_HEAD_SIZE,
+            player.y + PLAYER_HEAD_SIZE,
+            PLAYER_WIDTH - 2 * PLAYER_HEAD_SIZE,
+            PLAYER_HEAD_SIZE)
+          const baseHit = overlap(
+            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT,
+            player.x,
+            player.y + 2 * PLAYER_HEAD_SIZE,
+            PLAYER_WIDTH,
+            PLAYER_HEAD_SIZE)
+          if (headHit || bodyHit || baseHit) {
+            // B diminished
+            playChord([B2, B3, D4, F4, B4], 0, 4 * HIT_DURATION, HIT_VOLUME)
+            canon.hit = true
+            player.hit = true
+            log('player hit by canon', i)
+          }
+        }
+      }
+
+      function processShipHits () {
+        for (let i = 0; i < ships.length; i++) {
+          const ship = ships[i]
+          if (ship.health === 0) {
+            continue
+          }
+          if (ship.hit) {
+            ship.hit = false
+            pulse.live = false
+            ship.health--
+            ship.repaired = 0
+            if (ship.health === 0) {
+              shipsAlive--
+            }
+            player.score += (SHIP_COLORS.length - ship.health) * 10
+            log('ship hit processed; ship health reduced to', ship.health)
+          }
+        }
+      }
+
+      function processCanonHits () {
+        for (let i = 0; i < canons.length; i++) {
+          const canon = canons[i]
+          if (!canon.live) {
+            continue
+          }
+          if (canon.hit) {
+            canon.hit = false
+            pulse.live = false
+            canon.live = false
+            player.score++
+            log('canon hit processed')
+          }
+        }
+      }
+
+      function processPlayerHit () {
+        if (player.hit) {
+          player.hit = false
+          player.health--
+          player.repairySinceScore = player.score
+          log('player hit processed')
+        }
+      }
+
+      function readKeyDown (e) {
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+          startLeft(e)
+        } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+          startRight(e)
+        } else if (e.code === 'KeyP' || e.code === 'Space') {
+          actionPause(e)
+        } else if (e.code === 'KeyE' || e.code === 'Enter') {
+          actionEnter(e)
+        } else if (e.code === 'KeyM') {
+          actionMute(e)
+        } else if (e.code === 'KeyF') {
+          actionFullScreen(e)
+        }
+      }
+
+      function readKeyUp (e) {
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+          stopLeft(e)
+        } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+          stopRight(e)
+        }
+      }
+
+      function startLeft (e) {
+        e.preventDefault()
+        if (!leftOn) {
+          leftOn = true
+          moveLeft()
+        }
+      }
+
+      function stopLeft (e) {
+        e.preventDefault()
+        leftOn = false
+        clearTimeout(leftTimer)
+      }
+
+      function startRight (e) {
+        e.preventDefault()
+        if (!rightOn) {
+          rightOn = true
+          moveRight()
+        }
+      }
+
+      function stopRight (e) {
+        e.preventDefault()
+        rightOn = false
+        clearTimeout(rightTimer)
+      }
+
+      function moveLeft () {
+        if (state === INITIALIZED) {
+          startGame()
+        } else if (state !== PLAYING || player.x === PADDING) {
+          return
+        }
+        player.x -= PLAYER_MOVE_STEP
+        drawGame()
+        leftTimer = setTimeout(moveLeft, ACTION_REPEAT_INTERVAL)
+      }
+
+      function moveRight () {
+        const rightEdge = CANVAS_WIDTH - PLAYER_WIDTH - PADDING
+        if (state === INITIALIZED) {
+          startGame()
+        } else if (state !== PLAYING || player.x === rightEdge) {
+          return
+        }
+        player.x += PLAYER_MOVE_STEP
+        drawGame()
+        rightTimer = setTimeout(moveRight, ACTION_REPEAT_INTERVAL)
+      }
+
+      function actionEnter (e) {
+        e.preventDefault()
+        if (state === INFO) {
+          disableClickableInfo()
+          restartGame()
+        } else {
+          stopGame()
+          drawInfo()
+          enableClickableInfo()
+        }
+      }
+
+      function actionMute (e) {
+        e.preventDefault()
+        muted = !muted
+      }
+
+      function actionPause (e) {
+        e.preventDefault()
+        if (state === PLAYING) {
+          state = PAUSED
+          pauseGame()
+        } else if (state === PAUSED) {
+          state = PLAYING
+          startGame()
+        }
+      }
+
+      function actionFullScreen (e) {
+        if (document.fullscreenElement) {
+          console.log('exiting ...', canvas.exitFullscreen)
+          if (document.exitFullscreen) {
+            document.exitFullscreen()
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen()
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen()
+          }
+        } else {
+          if (canvas.requestFullscreen) {
+            canvas.requestFullscreen()
+          } else if (canvas.webkitRequestFullscreen) {
+            canvas.webkitRequestFullscreen()
+          } else if (canvas.msRequestFullscreen) {
+            canvas.msRequestFullscreen()
+          }
+        }
+      }
+
+      window.addEventListener('load', init)
+    </script>
+  </head>
+  <body>
+    <canvas id="canvas">
+    </canvas>
+    <div>
+      <div id="play">
+        <button id="left" title="Move Left">&larr;</button><!--
+        --><button id="right" title="Move Right">&rarr;</button>
+      </div><div id="more">
+        <button id="enter" title="Restart">&crarr;</button><!--
+        --><button id="pause" title="Play/Pause">&#x25b6;&#x2016;</button><!--
+        --><button id="mute" title="Mute/Unmute">&#x266b;</button>
+      </div>
+    </div>
+  </body>
+</html>
