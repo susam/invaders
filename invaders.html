@@ -188,6 +188,7 @@
         return Math.max(Math.min(x, max), min)
       }
 
+      // Game initialization.
       function init () {
         state = INITIALIZED
         initTime = Date.now()
@@ -256,6 +257,7 @@
         buttonMute.addEventListener('touchstart', actionMute)
       }
 
+      // Resize canvas and buttons on browser resize.
       function resizeUI () {
         document.body.style.padding = PADDING + 'px'
         if (window.innerWidth > window.innerHeight) {
@@ -302,6 +304,7 @@
         }
       }
 
+      // Functions to set/change game states.
       function resetGame () {
         player.score = 0
         level = 1
@@ -355,6 +358,7 @@
         log('restarted game')
       }
 
+      // Functions to reset game object states.
       function shipColor (ship) {
         return SHIP_COLORS[SHIP_COLORS.length - ship.health]
       }
@@ -429,6 +433,7 @@
         }
       }
 
+      // Health recovery rules.
       function repairPlayer () {
         const repairy = player.score - player.repairySinceScore
         if (player.health > 0 && player.health < PLAYER_COLORS.length &&
@@ -450,6 +455,7 @@
         }
       }
 
+      // Animation loop.
       function animate () {
         processShipHits()
         processCanonHits()
@@ -472,6 +478,7 @@
         gTimer = setTimeout(animate, REFRESH_INTERVAL)
       }
 
+      // Move game objects.
       function movePulse () {
         if (!pulse.live) {
           resetPulse()
@@ -522,6 +529,7 @@
         }
       }
 
+      // Render game state to canvas.
       function drawBackground () {
         gCtx.fillStyle = '#000'
         gCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
@@ -564,48 +572,6 @@
         writeLine(SOURCE_URL, textY, true)
         urlMinY = textY - ascent - 10
         urlMaxY = textY + descent + 10
-      }
-
-      function infoCursor (e) {
-        const cursorY = e.offsetY * CANVAS_HEIGHT / scaledCanvasHeight
-        if (cursorY >= urlMinY && cursorY <= urlMaxY) {
-          canvas.style.cursor = 'pointer'
-        } else {
-          canvas.style.cursor = 'auto'
-        }
-      }
-
-      function infoClick (e) {
-        const cursorY = e.offsetY * CANVAS_HEIGHT / scaledCanvasHeight
-        if (cursorY >= urlMinY && cursorY <= urlMaxY) {
-          window.location = SOURCE_URL
-        }
-      }
-
-      function enableClickableInfo () {
-        canvas.addEventListener('mousemove', infoCursor)
-        canvas.addEventListener('click', infoClick)
-      }
-
-      function disableClickableInfo () {
-        canvas.removeEventListener('mousemove', infoCursor)
-        canvas.removeEventListener('click', infoClick)
-      }
-
-      function writeLine (text, textY, underline) {
-        const textMetrics = gCtx.measureText(text)
-        const ascent = textMetrics.actualBoundingBoxAscent
-        const descent = textMetrics.actualBoundingBoxDescent
-        const height = ascent + descent
-        const width = textMetrics.width
-        const textX = Math.round((CANVAS_WIDTH - width) / 2)
-        gCtx.fillText(text, textX, textY)
-        if (underline) {
-          gCtx.moveTo(textX, textY + descent)
-          gCtx.lineTo(textX + width, textY + descent)
-          gCtx.stroke()
-        }
-        return Math.ceil(textY + height * 2)
       }
 
       function drawScore () {
@@ -681,6 +647,50 @@
         gCtx.fillRect(pulse.x, pulse.y, 4, 30)
       }
 
+      // Info screen displayed when a game ends.
+      function infoCursor (e) {
+        const cursorY = e.offsetY * CANVAS_HEIGHT / scaledCanvasHeight
+        if (cursorY >= urlMinY && cursorY <= urlMaxY) {
+          canvas.style.cursor = 'pointer'
+        } else {
+          canvas.style.cursor = 'auto'
+        }
+      }
+
+      function infoClick (e) {
+        const cursorY = e.offsetY * CANVAS_HEIGHT / scaledCanvasHeight
+        if (cursorY >= urlMinY && cursorY <= urlMaxY) {
+          window.location = SOURCE_URL
+        }
+      }
+
+      function enableClickableInfo () {
+        canvas.addEventListener('mousemove', infoCursor)
+        canvas.addEventListener('click', infoClick)
+      }
+
+      function disableClickableInfo () {
+        canvas.removeEventListener('mousemove', infoCursor)
+        canvas.removeEventListener('click', infoClick)
+      }
+
+      function writeLine (text, textY, underline) {
+        const textMetrics = gCtx.measureText(text)
+        const ascent = textMetrics.actualBoundingBoxAscent
+        const descent = textMetrics.actualBoundingBoxDescent
+        const height = ascent + descent
+        const width = textMetrics.width
+        const textX = Math.round((CANVAS_WIDTH - width) / 2)
+        gCtx.fillText(text, textX, textY)
+        if (underline) {
+          gCtx.moveTo(textX, textY + descent)
+          gCtx.lineTo(textX + width, textY + descent)
+          gCtx.stroke()
+        }
+        return Math.ceil(textY + height * 2)
+      }
+
+      // Audio
       function music () {
         const chords = [
           [C2, C3, A3, E3, C4], // A minor
@@ -728,6 +738,7 @@
                y1 + h1 > y2 && y1 < y2 + h2
       }
 
+      // Collision detection.
       function checkShipHits () {
         for (let i = 0; i < ships.length; i++) {
           const ship = ships[i]
@@ -846,6 +857,7 @@
         }
       }
 
+      // User input handling.
       function readKeyDown (e) {
         if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
           startLeft(e)
