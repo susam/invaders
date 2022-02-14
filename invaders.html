@@ -700,7 +700,7 @@
 
       function playChord (frequencies, delay, duration, volume) {
         const gain = aCtx.createGain()
-        const timeConstant = duration / 3
+        const timeConstant = Math.min(duration, 0.200) / 3
         const startTime = aCtx.currentTime + delay
         const stopTime = startTime + 10 * timeConstant
         gain.connect(compressor)
