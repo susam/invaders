@@ -99,22 +99,26 @@
 
       // C major scale notes.
       const C2 = 65.41
-      const D2 = 73.42
       const E2 = 82.41
-      const F2 = 87.31
       const G2 = 98.00
       const A2 = 110.00
-      const B2 = 123.47
       const C3 = 130.81
+      const D3 = 146.83
       const E3 = 164.81
       const F3 = 174.61
       const G3 = 196.00
       const A3 = 220.00
       const B3 = 246.94
       const C4 = 261.63
-      const D4 = 293.66
+      const E4 = 329.63
       const F4 = 349.23
+      const G4 = 392.00
+      const A4 = 440.00
       const B4 = 493.88
+      const C5 = 523.25
+      const D5 = 587.33
+      const F5 = 698.46
+      const B5 = 987.77
 
       // Time intervals.
       const REFRESH_INTERVAL = 20
@@ -679,10 +683,10 @@
 
       function music () {
         const chords = [
-          [A2, E2, C3], // A minor
-          [G2, B2, E3], // E minor
-          [D2, F2, A3], // D minor
-          [B2, D2, G3] // G major
+          [C2, C3, A3, E3, C4], // A minor
+          [E2, E3, G3, B3, E4], // E minor
+          [A2, D3, A3, F3, A4], // D minor
+          [G2, G3, B3, D3, G4] // G major
         ]
         const interval = 1 / bounded(level, 2, 12)
         if (aCtx.state === 'suspended') {
@@ -738,7 +742,7 @@
             ship.x, ship.y + SHIP_ROOF_HEIGHT, SHIP_WIDTH, SHIP_BODY_HEIGHT)
           if (hitBetweenRoofs || hitBetweenWings) {
             // F major
-            playChord([F2, C3, F3, A3, F4], 0, HIT_DURATION, HIT_VOLUME)
+            playChord([F3, C4, F4, A4, F5], 0, HIT_DURATION, HIT_VOLUME)
             ship.hit = true
             log('ship', i, 'is hit')
           }
@@ -756,7 +760,7 @@
             canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT)
           if (hit) {
             // C major
-            playChord([C2, C3, E3, G3, C4], 0, HIT_DURATION, HIT_VOLUME)
+            playChord([C3, C4, E4, G4, C5], 0, HIT_DURATION, HIT_VOLUME)
             canon.hit = true
             log('canon', i, 'is hit')
           }
@@ -789,7 +793,7 @@
             PLAYER_HEAD_SIZE)
           if (headHit || bodyHit || baseHit) {
             // B diminished
-            playChord([B2, B3, D4, F4, B4], 0, 4 * HIT_DURATION, HIT_VOLUME)
+            playChord([B3, B4, D5, F5, B5], 0, 4 * HIT_DURATION, HIT_VOLUME)
             canon.hit = true
             player.hit = true
             log('player hit by canon', i)
