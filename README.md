@@ -1,9 +1,9 @@
 Andromeda Invaders
 ==================
 
-[Andromeda Invaders][PLAY1] is a 1980s-arcade-style game runs in a
-modern web browser. This game is inspired by Space Invaders, the 1978
-arcade game developed by Tomohiro Nishikado. However, the game
+[Andromeda Invaders][PLAY1] is a 1980s-arcade-style game that runs in
+a modern web browser. This game is inspired by Space Invaders, the
+1978 arcade game developed by Tomohiro Nishikado. However, the game
 characters, gameplay, and some technical aspects of this game are very
 different from those of Space Invaders.
 
@@ -150,24 +150,24 @@ The following table shows the various game parameters for each level.
 |------:|------:|-----------:|------------:|------------:|
 |     1 |     3 |          2 |      [1, 4] |           2 |
 |     2 |     6 |          2 |      [1, 4] |           2 |
-|     3 |    10 |          3 |      [1, 4] |           3 |
-|     4 |    10 |          4 |      [2, 5] |           4 |
-|     5 |    10 |          5 |      [3, 6] |           5 |
-|     6 |    10 |          6 |      [4, 7] |           6 |
-|     7 |    10 |          7 |      [5, 8] |           7 |
-|     8 |    10 |          8 |      [6, 9] |           8 |
-|     9 |    10 |          9 |     [7, 10] |           9 |
-|    10 |    10 |         10 |     [8, 11] |          10 |
-|    11 |    10 |         11 |     [9, 12] |          11 |
-|    12 |    10 |         12 |    [10, 13] |          12 |
-|    13 |    10 |         13 |    [10, 14] |          12 |
-|    14 |    10 |         14 |    [10, 15] |          12 |
-|    15 |    10 |         15 |    [10, 15] |          12 |
-|    16 |    10 |         16 |    [10, 15] |          12 |
-|    17 |    10 |         17 |    [10, 15] |          12 |
-|    18 |    10 |         18 |    [10, 15] |          12 |
-|    19 |    10 |         19 |    [10, 15] |          12 |
-|    20 |    10 |         20 |    [10, 15] |          12 |
+|     3 |    10 |          2 |      [1, 4] |           3 |
+|     4 |    10 |          3 |      [2, 4] |           4 |
+|     5 |    10 |          3 |      [2, 5] |           5 |
+|     6 |    10 |          4 |      [3, 6] |           6 |
+|     7 |    10 |          5 |      [3, 7] |           7 |
+|     8 |    10 |          6 |      [4, 8] |           8 |
+|     9 |    10 |          6 |      [4, 9] |           9 |
+|    10 |    10 |          7 |     [5, 10] |          10 |
+|    11 |    10 |          9 |     [5, 11] |          11 |
+|    12 |    10 |          9 |     [6, 12] |          12 |
+|    13 |    10 |          9 |     [6, 13] |          12 |
+|    14 |    10 |         10 |     [7, 14] |          12 |
+|    15 |    10 |         11 |     [7, 15] |          12 |
+|    16 |    10 |         12 |     [8, 15] |          12 |
+|    17 |    10 |         12 |     [8, 15] |          12 |
+|    18 |    10 |         13 |     [9, 15] |          12 |
+|    19 |    10 |         14 |     [9, 15] |          12 |
+|    20 |    10 |         15 |    [10, 15] |          12 |
 |   ... |     " |          " |           " |           " |
 |  1000 |     " |          " |           " |           " |
 

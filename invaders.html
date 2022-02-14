@@ -388,7 +388,7 @@
       }
 
       function resetShips () {
-        const speed = bounded(level, 2, 20)
+        const speed = Math.floor(bounded(level * 3 / 4, 2, 15))
         shipsAlive = (level <= 2) ? (3 * level) : 10
         ships = []
         for (let i = 0; i < shipsAlive; i++) {
@@ -418,8 +418,8 @@
       }
 
       function resetCanon (canon, ship) {
-        const minSpeed = bounded(level - 2, 1, 10)
-        const maxSpeed = bounded(level + 1, 4, 15)
+        const minSpeed = bounded(Math.floor(level / 2), 1, 10)
+        const maxSpeed = bounded(level, 4, 15)
         if (ship.health > 0) {
           repairShip(ship)
           canon.x = ship.x + CANON_X_OFFSET
