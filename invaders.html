@@ -93,8 +93,8 @@
       const PLAYER_COLORS = ['#0c0', '#390', '#660']
 
       // Audio parameters.
-      const BACKGROUND_VOLUME = 0.8
-      const HIT_VOLUME = 1.0
+      const BACKGROUND_VOLUME = 1
+      const HIT_VOLUME = 1
       const HIT_DURATION = 0.125
 
       // C major scale notes.
@@ -127,6 +127,7 @@
       let canvas
       let gCtx
       let aCtx
+      let compressor
       let gTimer
       let aTimer
       let scaledCanvasWidth
@@ -221,6 +222,8 @@
           window.AudioContext = window.webkitAudioContext
         }
         aCtx = new window.AudioContext()
+        compressor = aCtx.createDynamicsCompressor()
+        compressor.connect(aCtx.destination)
       }
 
       function initEventListeners () {
@@ -700,12 +703,11 @@
         const timeConstant = duration / 3
         const startTime = aCtx.currentTime + delay
         const stopTime = startTime + 10 * timeConstant
-        gain.connect(aCtx.destination)
+        gain.connect(compressor)
         for (let i = 0; i < frequencies.length; i++) {
           const oscillator = aCtx.createOscillator()
-          const scaledVolume = muted ? 0 : volume / frequencies.length
           oscillator.frequency.value = frequencies[i]
-          gain.gain.setValueAtTime(scaledVolume, startTime)
+          gain.gain.setValueAtTime(muted ? 0 : volume, startTime)
           gain.gain.setTargetAtTime(0, startTime, timeConstant)
           oscillator.connect(gain)
           oscillator.start(startTime)
