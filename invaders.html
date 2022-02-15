@@ -913,6 +913,7 @@
       function moveLeft () {
         if (state === INITIALIZED) {
           startGame()
+          return
         } else if (state !== PLAYING || player.x === PADDING) {
           return
         }
