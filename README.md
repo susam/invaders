@@ -103,28 +103,27 @@ game.*
 *Not so long time ago in a galaxy near, near away ...*
 
 Bright orange ships visit the player's planet and begins dropping
-canons to hit the player. The player defends its planet by hitting the
-ships and the falling canons with laser pulses. When a canon is hit
-successfully, it vanishes instantly. When a ship is hit successfully,
-it loses its health. The health is indicated by the colour of the
-ship. Bright orange indicates perfect health. When a bright orange is
-hit, it turns dark orange. When a dark orange ship is hit, it turns
-dark red. A dark red ship is in critical condition. If a dark red ship
-is hit again, it dies.
+boulders from space to hit the player. The player defends itself by
+hitting the ships and the falling boulders with laser pulses. When a
+boulder is hit successfully, it vanishes instantly. When a ship is hit
+successfully, it loses its health. The health is indicated by the
+colour of the ship. Bright orange indicates perfect health. When a
+bright orange ship is hit, it turns dark orange. When a dark orange
+ship is hit, it turns dark red. A dark red ship is in critical
+condition. If a dark red ship is hit again, it vanishes.
 
-When a canon hits the player it loses health. The player is initially
+When a boulder hits the player it loses health. The player is initially
 bright green that indicates that it is in perfect health. When a
 perfectly healthy player is hit, it turns dark green. If the player is
 hit again while it is dark green, it turns dull yellow. If the player
-is hit when it is dull yellow, it dies. The game ends when the player
-dies.
+is hit when it is dull yellow, it vanishes and the game ends.
 
 To summarize, each ship has three grades of health and the player too
 has three grades of health. After being hit and losing health, the
-ships and canons can regain health as the game continues. A ship gains
-health by one grade after it drops ten canons since it was last hit.
-The player gains health by one grade after it gains 100 points since
-it was last hit.
+ships and the player can regain health as the game continues. A ship
+gains health by one grade after it drops ten boulders since it was
+last hit. The player gains health by one grade after it gains 100
+points since it was last hit.
 
 
 ### Game Levels
@@ -135,49 +134,50 @@ level is reset to 1, however, the score remains intact, so one can
 keep playing levels 1 to 1000 repeatedly in a loop if one has the
 patience and skill to do so.
 
-At level 1, there are only three ships that visit the player's planet.
-At level 2, there are six ships that visit the planet. At level 3 and
-above, there are ten ships that visit the planet.
+At level 1, only three ships visit the player's planet. At level 2,
+six ships visit the planet. At level 3 and above, ten ships visit the
+planet.
 
-The canons drop at various random speeds. The range of possible speeds
-for the canons is decided by the game level. The speed of the ships
+The boulders drop at various random speeds. The range of possible speeds
+for the boulders is decided by the game level. The speed of the ships
 too depends on the level. Further, the tempo of the background music
 too depends on the level.
 
 The following table shows the various game parameters for each level.
 
-| Level | Ships | Ship Speed | Canon Speed | Music Tempo |
-|------:|------:|-----------:|------------:|------------:|
-|     1 |     3 |          2 |      [1, 4] |           2 |
-|     2 |     6 |          2 |      [1, 4] |           2 |
-|     3 |    10 |          2 |      [1, 4] |           3 |
-|     4 |    10 |          3 |      [2, 4] |           4 |
-|     5 |    10 |          3 |      [2, 5] |           5 |
-|     6 |    10 |          4 |      [3, 6] |           6 |
-|     7 |    10 |          5 |      [3, 7] |           7 |
-|     8 |    10 |          6 |      [4, 8] |           8 |
-|     9 |    10 |          6 |      [4, 9] |           9 |
-|    10 |    10 |          7 |     [5, 10] |          10 |
-|    11 |    10 |          9 |     [5, 11] |          11 |
-|    12 |    10 |          9 |     [6, 12] |          12 |
-|    13 |    10 |          9 |     [6, 13] |          12 |
-|    14 |    10 |         10 |     [7, 14] |          12 |
-|    15 |    10 |         11 |     [7, 15] |          12 |
-|    16 |    10 |         12 |     [8, 15] |          12 |
-|    17 |    10 |         12 |     [8, 15] |          12 |
-|    18 |    10 |         13 |     [9, 15] |          12 |
-|    19 |    10 |         14 |     [9, 15] |          12 |
-|    20 |    10 |         15 |    [10, 15] |          12 |
-|   ... |     " |          " |           " |           " |
-|  1000 |     " |          " |           " |           " |
+| Level | Ships | Ship Speed | Boulder Speed | Music Tempo |
+|------:|------:|-----------:|--------------:|------------:|
+|     1 |     3 |          2 |        [1, 4] |           2 |
+|     2 |     6 |          2 |        [1, 4] |           2 |
+|     3 |    10 |          2 |        [1, 4] |           3 |
+|     4 |    10 |          3 |        [2, 4] |           4 |
+|     5 |    10 |          3 |        [2, 5] |           5 |
+|     6 |    10 |          4 |        [3, 6] |           6 |
+|     7 |    10 |          5 |        [3, 7] |           7 |
+|     8 |    10 |          6 |        [4, 8] |           8 |
+|     9 |    10 |          6 |        [4, 9] |           9 |
+|    10 |    10 |          7 |       [5, 10] |          10 |
+|    11 |    10 |          9 |       [5, 11] |          11 |
+|    12 |    10 |          9 |       [6, 12] |          12 |
+|    13 |    10 |          9 |       [6, 13] |          12 |
+|    14 |    10 |         10 |       [7, 14] |          12 |
+|    15 |    10 |         11 |       [7, 15] |          12 |
+|    16 |    10 |         12 |       [8, 15] |          12 |
+|    17 |    10 |         12 |       [8, 15] |          12 |
+|    18 |    10 |         13 |       [9, 15] |          12 |
+|    19 |    10 |         14 |       [9, 15] |          12 |
+|    20 |    10 |         15 |      [10, 15] |          12 |
+|   ... |     " |          " |             " |           " |
+|  1000 |     " |          " |             " |           " |
 
 In the table above, the unit of speed is pixels per frame (PPF), i.e.,
 the number of pixels an object appears to move from one game frame to
 another. Here, the term *game frame* refers to a single instance of
 rendering the game state to the HTML5 `<canvas>`. The game state is
-rendered 50 times a second. The speed of the canons is chosen randomly
-from the closed interval shown in the *Canon Speed* column. The unit
-of music tempo is beats per second. Each chord is played in a beat.
+rendered to the canvas 50 times per second. The speed of the boulders
+is chosen randomly from the closed interval shown in the *Boulder
+Speed* column. The unit of music tempo is beats per second. Each chord
+is played in a beat.
 
 To summarize the table above, the game becomes progressively more
 difficult to play in each level until level 20. The game parameters do
@@ -189,9 +189,9 @@ might find that it is quite difficult to reach even level 10 or so.
 
 ### Game Points
 
-The player gets 10 points for hitting a bright orange ship, 20 points
-for hitting a dark orange ship, and 30 points for hitting a dark red
-ship. The player gets 1 point for hitting a canon.
+The player gets 1 point for hitting a boulder, 10 points for hitting a
+bright orange ship, 20 points for hitting a dark orange ship, and 30
+points for hitting a dark red ship.
 
 
 Why?

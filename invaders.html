@@ -83,10 +83,10 @@
       const SHIP_BODY_HEIGHT = SHIP_HEIGHT - 2 * SHIP_ROOF_HEIGHT
       const SHIP_LANE_HEIGHT = 35
 
-      const CANON_WIDTH = 6
-      const CANON_HEIGHT = 6
-      const CANON_X_OFFSET = (SHIP_WIDTH - CANON_WIDTH) / 2
-      const CANON_Y_OFFSET = SHIP_HEIGHT - CANON_HEIGHT
+      const BOULDER_WIDTH = 6
+      const BOULDER_HEIGHT = 6
+      const BOULDER_X_OFFSET = (SHIP_WIDTH - BOULDER_WIDTH) / 2
+      const BOULDER_Y_OFFSET = SHIP_HEIGHT - BOULDER_HEIGHT
 
       // Color palettes.
       const SHIP_COLORS = ['#f60', '#c30', '#900']
@@ -163,7 +163,7 @@
       const player = {}
       const pulse = {}
       let ships
-      let canons
+      let boulders
 
       // Utility functions.
       function log () {
@@ -311,7 +311,7 @@
         resetPlayer()
         resetPulse()
         resetShips()
-        resetCanons()
+        resetBoulders()
         log('reset game')
       }
 
@@ -323,7 +323,7 @@
         }
         resetPulse()
         resetShips()
-        resetCanons()
+        resetBoulders()
         log('created game level', level)
       }
 
@@ -407,29 +407,29 @@
         log('reset', shipsAlive, 'ships with speed', speed)
       }
 
-      function resetCanons () {
-        canons = []
+      function resetBoulders () {
+        boulders = []
         for (let i = 0; i < shipsAlive; i++) {
-          const canon = {}
-          resetCanon(canon, ships[i])
-          canons.push(canon)
+          const boulder = {}
+          resetBoulder(boulder, ships[i])
+          boulders.push(boulder)
         }
-        log('reset canons')
+        log('reset boulders')
       }
 
-      function resetCanon (canon, ship) {
+      function resetBoulder (boulder, ship) {
         const minSpeed = bounded(Math.floor(level / 2), 1, 10)
         const maxSpeed = bounded(level, 4, 15)
         if (ship.health > 0) {
           repairShip(ship)
-          canon.x = ship.x + CANON_X_OFFSET
-          canon.y = ship.y + CANON_Y_OFFSET
-          canon.color = shipColor(ship)
-          canon.speed = random(minSpeed, maxSpeed)
-          canon.hit = false
-          canon.live = true
+          boulder.x = ship.x + BOULDER_X_OFFSET
+          boulder.y = ship.y + BOULDER_Y_OFFSET
+          boulder.color = shipColor(ship)
+          boulder.speed = random(minSpeed, maxSpeed)
+          boulder.hit = false
+          boulder.live = true
         } else {
-          canon.live = false
+          boulder.live = false
         }
       }
 
@@ -458,7 +458,7 @@
       // Animation loop.
       function animate () {
         processShipHits()
-        processCanonHits()
+        processBoulderHits()
         processPlayerHit()
         if (shipsAlive === 0) {
           newGameLevel()
@@ -466,9 +466,9 @@
         repairPlayer()
         movePulse()
         moveShips()
-        moveCanons()
+        moveBoulders()
         checkShipHits()
-        checkCanonHits()
+        checkBoulderHits()
         checkPlayerHit()
         drawGame()
         if (player.health === 0) {
@@ -513,18 +513,18 @@
         }
       }
 
-      function moveCanons () {
-        for (let i = 0; i < canons.length; i++) {
-          const canon = canons[i]
+      function moveBoulders () {
+        for (let i = 0; i < boulders.length; i++) {
+          const boulder = boulders[i]
           const ship = ships[i]
-          canon.y += canon.speed
-          if (!canon.live) {
-            resetCanon(canon, ship)
-          } else if (canon.y > CANVAS_HEIGHT) {
-            canon.live = false
+          boulder.y += boulder.speed
+          if (!boulder.live) {
+            resetBoulder(boulder, ship)
+          } else if (boulder.y > CANVAS_HEIGHT) {
+            boulder.live = false
           }
-          if (canon.y - ship.y <= 5 * CANON_HEIGHT) {
-            canon.x = ship.x + CANON_X_OFFSET
+          if (boulder.y - ship.y <= 5 * BOULDER_HEIGHT) {
+            boulder.x = ship.x + BOULDER_X_OFFSET
           }
         }
       }
@@ -540,7 +540,7 @@
         drawScore()
         drawPlayer()
         drawShips()
-        drawCanons()
+        drawBoulders()
         drawPulse()
       }
 
@@ -606,14 +606,14 @@
         }
       }
 
-      function drawCanons () {
-        for (let i = 0; i < canons.length; i++) {
-          const canon = canons[i]
-          if (!canon.live) {
+      function drawBoulders () {
+        for (let i = 0; i < boulders.length; i++) {
+          const boulder = boulders[i]
+          if (!boulder.live) {
             continue
           }
-          gCtx.fillStyle = canon.color
-          gCtx.fillRect(canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT)
+          gCtx.fillStyle = boulder.color
+          gCtx.fillRect(boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT)
         }
       }
 
@@ -760,44 +760,44 @@
         }
       }
 
-      function checkCanonHits () {
-        for (let i = 0; i < canons.length; i++) {
-          const canon = canons[i]
-          if (!canon.live) {
+      function checkBoulderHits () {
+        for (let i = 0; i < boulders.length; i++) {
+          const boulder = boulders[i]
+          if (!boulder.live) {
             continue
           }
           const hit = overlap(
             pulse.x, pulse.y, PULSE_WIDTH, PULSE_HEIGHT,
-            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT)
+            boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT)
           if (hit) {
             // C major
             playChord([C3, C4, E4, G4, C5], 0, HIT_DURATION, HIT_VOLUME)
-            canon.hit = true
-            log('canon', i, 'is hit')
+            boulder.hit = true
+            log('boulder', i, 'is hit')
           }
         }
       }
 
       function checkPlayerHit () {
-        for (let i = 0; i < canons.length; i++) {
-          const canon = canons[i]
-          if (!canon.live) {
+        for (let i = 0; i < boulders.length; i++) {
+          const boulder = boulders[i]
+          if (!boulder.live) {
             continue
           }
           const headHit = overlap(
-            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT,
+            boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT,
             player.x + 2 * PLAYER_HEAD_SIZE,
             player.y,
             PLAYER_HEAD_SIZE,
             PLAYER_HEAD_SIZE)
           const bodyHit = overlap(
-            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT,
+            boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT,
             player.x + PLAYER_HEAD_SIZE,
             player.y + PLAYER_HEAD_SIZE,
             PLAYER_WIDTH - 2 * PLAYER_HEAD_SIZE,
             PLAYER_HEAD_SIZE)
           const baseHit = overlap(
-            canon.x, canon.y, CANON_WIDTH, CANON_HEIGHT,
+            boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT,
             player.x,
             player.y + 2 * PLAYER_HEAD_SIZE,
             PLAYER_WIDTH,
@@ -805,9 +805,9 @@
           if (headHit || bodyHit || baseHit) {
             // B diminished
             playChord([B3, B4, D5, F5, B5], 0, 4 * HIT_DURATION, HIT_VOLUME)
-            canon.hit = true
+            boulder.hit = true
             player.hit = true
-            log('player hit by canon', i)
+            log('player hit by boulder', i)
           }
         }
       }
@@ -832,18 +832,18 @@
         }
       }
 
-      function processCanonHits () {
-        for (let i = 0; i < canons.length; i++) {
-          const canon = canons[i]
-          if (!canon.live) {
+      function processBoulderHits () {
+        for (let i = 0; i < boulders.length; i++) {
+          const boulder = boulders[i]
+          if (!boulder.live) {
             continue
           }
-          if (canon.hit) {
-            canon.hit = false
+          if (boulder.hit) {
+            boulder.hit = false
             pulse.live = false
-            canon.live = false
+            boulder.live = false
             player.score++
-            log('canon hit processed')
+            log('boulder hit processed')
           }
         }
       }
