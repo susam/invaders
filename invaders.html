@@ -388,7 +388,7 @@
       }
 
       function resetShips () {
-        const speed = Math.floor(bounded(level * 3 / 4, 2, 15))
+        const speed = Math.floor(bounded(level / 2, 2, 10))
         shipsAlive = (level <= 2) ? (3 * level) : 10
         ships = []
         for (let i = 0; i < shipsAlive; i++) {
