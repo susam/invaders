@@ -388,7 +388,7 @@
       }
 
       function resetShips () {
-        const speed = Math.floor(bounded(level / 2, 2, 10))
+        const shipSpeed = Math.min(Math.floor((level + 6) / 3), 8)
         shipsAlive = (level <= 2) ? (3 * level) : 10
         ships = []
         for (let i = 0; i < shipsAlive; i++) {
@@ -397,14 +397,14 @@
           ship.y = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i
           ship.direction = random(0, 1) === 0 ? -1 : 1
           ship.health = SHIP_COLORS.length
-          ship.speed = speed
+          ship.speed = shipSpeed
           ship.repaired = 0
           ship.hit = false
           ships.push(ship)
           log('ship ' + i + '; x: ' + ship.x + '; y: ' + ship.y +
               '; height: ' + SHIP_HEIGHT)
         }
-        log('reset', shipsAlive, 'ships with speed', speed)
+        log('reset', shipsAlive, 'ships with speed', shipSpeed)
       }
 
       function resetBoulders () {
@@ -418,8 +418,8 @@
       }
 
       function resetBoulder (boulder, ship) {
-        const minSpeed = bounded(Math.floor(level / 2), 1, 10)
-        const maxSpeed = bounded(level, 4, 15)
+        const minSpeed = Math.min(Math.floor((level + 4) / 3), 8)
+        const maxSpeed = Math.min(Math.floor((level + 11) / 3), 10)
         if (ship.health > 0) {
           repairShip(ship)
           boulder.x = ship.x + BOULDER_X_OFFSET
