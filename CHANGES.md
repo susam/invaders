@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.2.0 (2022-02-18)
+------------------
+
+### Changed
+
+- Use only non-emoji symbols for HTML buttons.
+- Make background music volume louder.
+- Control music volume using a dynamics compressor node.
+- Shift notes an octave higher to make them audible on all speakers.
+- Increase the difficulty levels in a more gradual manner.
+
+
 0.1.0 (2022-02-13)
 ------------------
 
