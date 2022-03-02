@@ -1,5 +1,5 @@
 <!--
-  Andromeda Invaders 0.2.0
+  Andromeda Invaders 0.3.0
   Copyright (c) 2022 Susam Pal
   Source: https://github.com/susam/invaders
   License: MIT
@@ -42,7 +42,7 @@
 
       // Metadata for info screen.
       const NAME = 'Andromeda Invaders'
-      const VERSION = '0.2.0'
+      const VERSION = '0.3.0'
       const COPYRIGHT = 'Copyright (c) 2022 Susam Pal'
       const SOURCE_URL = 'https://github.com/susam/invaders'
 
@@ -290,7 +290,7 @@
       }
 
       function resizeButtons (start, len, height, padding) {
-        const width = (scaledCanvasWidth - (len - 1) * padding) / len
+        const width = Math.max((scaledCanvasWidth - (len - 1) * padding) / len, 40)
         for (let i = start; i < start + len; i++) {
           const button = buttonList[i]
           button.style.height = height + 'px'
