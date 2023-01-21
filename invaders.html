@@ -53,7 +53,7 @@
       const ENDED = 'ended'
       const INFO = 'info'
 
-      const LOGGING_ENABLED = false
+      const LOGGING_ENABLED = true
 
       // Graphics dimensions.
       const PADDING = 10
@@ -130,7 +130,7 @@
       // Graphics and audio contexts.
       let canvas
       let gCtx
-      let aCtx
+      let aCtx = null
       let compressor
       let gTimer
       let aTimer
@@ -194,7 +194,6 @@
         initTime = Date.now()
         initGraphics()
         initButtons()
-        initAudio()
         initEventListeners()
         resizeUI()
         resetGame()
@@ -223,12 +222,16 @@
       }
 
       function initAudio () {
+        if (aCtx !== null) {
+          return
+        }
         if (typeof window.AudioContext === 'undefined') {
           window.AudioContext = window.webkitAudioContext
         }
         aCtx = new window.AudioContext()
         compressor = aCtx.createDynamicsCompressor()
         compressor.connect(aCtx.destination)
+        log('initialized audio')
       }
 
       function initEventListeners () {
@@ -329,7 +332,8 @@
 
       function startGame () {
         state = PLAYING
-        music()
+        initAudio()
+        startMusic()
         animate()
         log('started game')
       }
@@ -691,7 +695,17 @@
       }
 
       // Audio
-      function music () {
+      function startMusic() {
+        if (aCtx.state === 'suspended') {
+          aCtx.resume().then(function () {
+            playMusic()
+          })
+        } else {
+          playMusic()
+        }
+      }
+
+      function playMusic () {
         const chords = [
           [C2, C3, A3, E3, C4], // A minor
           [E2, E3, G3, B3, E4], // E minor
@@ -699,11 +713,8 @@
           [G2, G3, B3, D3, G4] // G major
         ]
         const interval = 1 / bounded(level, 2, 12)
-        if (aCtx.state === 'suspended') {
-          aCtx.resume()
-        }
         playChordProgression(chords, interval, BACKGROUND_VOLUME)
-        aTimer = setTimeout(music, chords.length * interval * 1000)
+        aTimer = setTimeout(playMusic, chords.length * interval * 1000)
       }
 
       function playChordProgression (chords, duration, volume) {
