@@ -170,14 +170,14 @@
       function log () {
         if (LOGGING_ENABLED) {
           const args = Array.prototype.slice.call(arguments)
-          args.unshift('time: ' + ((Date.now() - initTime) / 1000) +
-                       '; state: ' + state +
-                       '; level: ' + level +
-                       '; score: ' + player.score +
-                       '; health: ' + player.health +
-                       '; ships: ' + shipsAlive +
-                       ';')
-          console.log.apply(console, args)
+          const prefix  = ('time: ' + ((Date.now() - initTime) / 1000) +
+                           '; state: ' + state +
+                           '; level: ' + level +
+                           '; score: ' + player.score +
+                           '; health: ' + player.health +
+                           '; ships: ' + shipsAlive +
+                           '; ')
+          console.log(prefix + args.join(' '))
         }
       }
 
@@ -697,10 +697,15 @@
 
       // Audio
       function startMusic () {
+        log('audio state is', aCtx.state)
         if (aCtx.state === 'suspended') {
-          aCtx.resume()
+          aCtx.resume().then(function () {
+            log('audio has resumed; audio state is', aCtx.state)
+            playMusic()
+          })
+        } else {
+          playMusic()
         }
-        playMusic()
       }
 
       function playMusic () {
@@ -712,6 +717,13 @@
         ]
         const interval = 1 / bounded(level, 2, 12)
         playChordProgression(chords, interval, BACKGROUND_VOLUME)
+
+        // If the browser suspends audio when the game starts and a
+        // human player pauses and resumes the game, two invocations
+        // of aCtx.resume() callbacks would interleave. The following
+        // clearTimeout() avoids two music loops running
+        // simultaneously in such a case.
+        clearTimeout(aTimer)
         aTimer = setTimeout(playMusic, chords.length * interval * 1000)
       }
 
@@ -722,9 +734,6 @@
       }
 
       function playChord (frequencies, delay, duration, volume) {
-        if (aCtx.state !== 'running') {
-          return
-        }
         const gain = aCtx.createGain()
         const timeConstant = Math.min(duration, 0.200) / 3
         const startTime = aCtx.currentTime + delay
