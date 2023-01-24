@@ -33,6 +33,7 @@
         box-sizing: border-box;
         border: 1px solid #333;
         user-select: none;
+        vertical-align: middle;
         -moz-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
@@ -53,6 +54,9 @@
       const PAUSED = 'paused'
       const ENDED = 'ended'
       const INFO = 'info'
+
+      const PLAY_SYMBOL = '&#x25ba;'
+      const PAUSE_SYMBOL = '&#x25a0;'
 
       const LOGGING_ENABLED = true
 
@@ -199,6 +203,7 @@
         resizeUI()
         resetGame()
         drawGame()
+        buttonPause.innerHTML = PLAY_SYMBOL
         log('initialized canvas')
       }
 
@@ -336,6 +341,7 @@
         initAudio()
         startMusic()
         animate()
+        buttonPause.innerHTML = PAUSE_SYMBOL
         log('started game')
       }
 
@@ -350,6 +356,7 @@
         state = PAUSED
         clearTimeout(gTimer)
         clearTimeout(aTimer)
+        buttonPause.innerHTML = PLAY_SYMBOL
         log('paused game')
       }
 
@@ -360,6 +367,7 @@
         state = INITIALIZED
         resetGame()
         drawGame()
+        buttonPause.innerHTML = PLAY_SYMBOL
         log('restarted game')
       }
 
@@ -974,11 +982,11 @@
 
       function actionPause (e) {
         e.preventDefault()
-        if (state === PLAYING) {
-          state = PAUSED
+        if (state === INITIALIZED) {
+          startGame()
+        } else if (state === PLAYING) {
           pauseGame()
         } else if (state === PAUSED) {
-          state = PLAYING
           startGame()
         }
       }
@@ -1015,7 +1023,7 @@
         --><button id="right" title="Move Right">&rarr;</button>
       </div><div id="more">
         <button id="enter" title="Restart">&crarr;</button><!--
-        --><button id="pause" title="Play/Pause">&#x25ba;&#x2551;</button><!--
+        --><button id="pause" title="Play/Pause">&#x25ba;</button><!--
         --><button id="mute" title="Mute/Unmute">&#x266b;</button>
       </div>
     </div>
