@@ -174,13 +174,13 @@
       function log () {
         if (LOGGING_ENABLED) {
           const args = Array.prototype.slice.call(arguments)
-          const prefix  = ('time: ' + ((Date.now() - initTime) / 1000) +
-                           '; state: ' + state +
-                           '; level: ' + level +
-                           '; score: ' + player.score +
-                           '; health: ' + player.health +
-                           '; ships: ' + shipsAlive +
-                           '; ')
+          const prefix = ('time: ' + ((Date.now() - initTime) / 1000) +
+                          '; state: ' + state +
+                          '; level: ' + level +
+                          '; score: ' + player.score +
+                          '; health: ' + player.health +
+                          '; ships: ' + shipsAlive +
+                          '; ')
           console.log(prefix + args.join(' '))
         }
       }
