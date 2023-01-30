@@ -747,6 +747,9 @@
       }
 
       function playChord (frequencies, delay, duration, volume) {
+        if (aCtx.state === 'suspended') {
+          return
+        }
         const gain = aCtx.createGain()
         const timeConstant = Math.min(duration, 0.200) / 3
         const startTime = aCtx.currentTime + delay

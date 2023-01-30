@@ -9,6 +9,7 @@ Changelog
 - Perform pixelated rendering to avoid anti-aliasing.
 - Toggle symbol on play/pause button depending on play/pause state.
 - Draw text using rectangles.
+- Skip playing chords if audio context is suspended.
 
 
 0.3.0 (2022-03-02)
