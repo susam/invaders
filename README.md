@@ -11,7 +11,7 @@ different from those of Space Invaders.
 
 **[PLAY NOW!][PLAY1]**
 
-[IMG]: https://i.imgur.com/Bp7vIBZ.png
+[IMG]: https://i.imgur.com/92l0Fct.png
 
 
 Contents

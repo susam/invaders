@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.4.0 (UNRELEASED)
+------------------
+
+### Changed
+
+- Perform pixelated rendering to avoid anti-aliasing.
+- Toggle symbol on play/pause button depending on play/pause state.
+- Draw text using rectangles.
+
+
 0.3.0 (2022-03-02)
 ------------------
 
