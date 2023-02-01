@@ -24,6 +24,7 @@ Contents
 * [Why?](#why)
 * [License](#license)
 * [Support](#support)
+* [More](#more)
 
 
 Play
@@ -75,9 +76,8 @@ Technical Details
 
 All of the graphics is done by drawing rectangles on an HTML5
 `<canvas>` element using the Canvas API. In fact, any text appearing
-on the canvas is also written by drawing squares on the canvas. The
-bitmap arrays used to draw text are available at
-[github.com/susam/pcface](https://github.com/susam/pcface).
+on the canvas is also displayed by drawing squares on the canvas. The
+bitmaps used to draw text are embedded as integer arrays in the code.
 
 All of the audio is done by playing sine waves generated using
 `OscillatorNode` of the Web Audio API. The sine waves used for the
@@ -235,6 +235,32 @@ Support
 To report bugs or ask questions, [create issues][ISSUES].
 
 [ISSUES]: https://github.com/susam/invaders/issues
+
+
+More
+----
+
+This project uses bitmap arrays to render text by drawing squares on
+canvas. The bitmap of only those characters that are needed in this
+game are included in the source code. This includes the bitmap of ten
+digits, a few punctuation characters, and a very limited set of
+uppercase and lowercase letters.
+
+The glyphs for these characters are taken from a raster font named
+[Modern DOS 8x16][MDOS] version 20190101.02. This font was developed
+by Jayvee Enaguas and it is available under the terms of [CC0 1.0
+Universal (CC0 1.0) Public Domain Dedication][CC0]. This font is based
+on the [IBM VGA 8x16][VGA] and [Verite 8x16][VERITE] OEM fonts.
+
+If you are doing something similar and want the bitmap arrays for a
+larger set of characters, see another project of mine named [PC
+Face](https://github.com/susam/pcface) which offers bitmap arrays for
+all 256 characters of the CP437 character set.
+
+[MDOS]: https://www.dafont.com/modern-dos.font
+[CC0]: https://creativecommons.org/publicdomain/zero/1.0/
+[VGA]: https://int10h.org/oldschool-pc-fonts/fontlist/font?ibm_vga_8x16
+[VERITE]: https://int10h.org/oldschool-pc-fonts/fontlist/font?verite_8x16
 
 
 <!--
