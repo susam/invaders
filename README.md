@@ -242,7 +242,8 @@ Release Checklist
 -----------------
 
 - Update version in package.json.
-- Update copyright in invaders.html.
+- Update version in invaders.html (2 places).
+- Update copyright in invaders.html (2 places).
 - Update copyright in LICENSE.md.
 - Update CHANGES.md.
 - Run: npm run lint
