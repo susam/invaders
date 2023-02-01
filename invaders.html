@@ -1,6 +1,6 @@
 <!--
   Andromeda Invaders 0.4.0-dev
-  Copyright (c) 2022 Susam Pal
+  Copyright (c) 2022-2023 Susam Pal
   Source: https://github.com/susam/invaders
   License: MIT
 -->
@@ -44,8 +44,9 @@
 
       // Metadata for info screen.
       const NAME = 'Andromeda Invaders'
-      const VERSION = '0.3.0'
-      const COPYRIGHT = 'Copyright (c) 2022 Susam Pal'
+      const VERSION = '0.4.0-dev'
+      const COPYRIGHT = 'Copyright (c) 2022-2023 Susam Pal'
+      const LICENSE = 'Licensed under the MIT License'
       const SOURCE_URL = 'https://github.com/susam/invaders'
 
       // Lifecycle states.
@@ -58,18 +59,20 @@
       const PLAY_SYMBOL = '&#x25ba;'
       const PAUSE_SYMBOL = '&#x25a0;'
 
-      const LOGGING_ENABLED = true
+      const LOGGING_ENABLED = false
 
       // Graphics dimensions.
       const PADDING = 10
       const CANVAS_WIDTH = 640
       const CANVAS_HEIGHT = 480
 
-      const SCORE_Y = PADDING
-      const SCORE_PADDING = 30
+      const FONT_SCALE = 2
+      const FONT_WIDTH = 8 * FONT_SCALE
+      const FONT_HEIGHT = 16 * FONT_SCALE
+      const FONT_TOP_BLANK = 2 * FONT_SCALE
 
-      const FONT_WIDTH = 8
-      const FONT_HEIGHT = 16
+      const SCORE_Y = PADDING - FONT_TOP_BLANK
+      const TOP_SHIP_Y = 40
 
       const PLAYER_WIDTH = 50
       const PLAYER_HEIGHT = 30
@@ -410,7 +413,7 @@
         for (let i = 0; i < shipsAlive; i++) {
           const ship = {}
           ship.x = random(PADDING, CANVAS_WIDTH - PADDING - SHIP_WIDTH)
-          ship.y = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i
+          ship.y = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i
           ship.direction = random(0, 1) === 0 ? -1 : 1
           ship.health = SHIP_COLORS.length
           ship.speed = shipSpeed
@@ -519,8 +522,8 @@
             ship.x = CANVAS_WIDTH - PADDING - SHIP_WIDTH
             ship.direction *= -1
           }
-          const minY = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i
-          const maxY = SCORE_Y + SCORE_PADDING + SHIP_LANE_HEIGHT * i + 10
+          const minY = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i
+          const maxY = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i + 10
           ship.y += random(-1, 1)
           ship.y = bounded(ship.y, minY, maxY)
           if (random(1, 100) === 1) {
@@ -567,21 +570,21 @@
         state = INFO
         drawBackground()
 
-        let textY = 180
-        drawText(NAME + ' v' + VERSION, textY, false)
+        let textY = (CANVAS_HEIGHT - 7 * FONT_HEIGHT) / 2
+        drawCenterText(NAME + ' v' + VERSION, textY, false)
         textY += 2 * FONT_HEIGHT
-        drawText(COPYRIGHT, textY, false)
+        drawCenterText(COPYRIGHT, textY, false)
         textY += 2 * FONT_HEIGHT
-        drawText('Licensed under the terms of the MIT License', textY, false)
+        drawCenterText(LICENSE, textY, false)
         textY += 2 * FONT_HEIGHT
-        drawText(SOURCE_URL, textY, true)
+        drawCenterText(SOURCE_URL, textY, true)
         urlMinY = textY
         urlMaxY = textY + FONT_HEIGHT
       }
 
       function drawScore () {
         const text = player.score + ' (L' + level + ')'
-        drawString(text, PADDING, SCORE_Y, 1)
+        drawText(text, PADDING, SCORE_Y)
       }
 
       function drawShips () {
@@ -692,19 +695,19 @@
         }
       }
 
-      function drawString (line, x, y, s) {
+      function drawText (line, x, y) {
         gCtx.fillStyle = PLAYER_COLORS[0]
         for (let i = 0; i < line.length; i++) {
-          drawChar(line.charAt(i), x + i * s * FONT_WIDTH, y, s)
+          drawChar(line.charAt(i), x + i * FONT_WIDTH, y, FONT_SCALE)
         }
       }
 
-      function drawText (text, textY, underline) {
+      function drawCenterText (text, textY, underline) {
         const width = text.length * FONT_WIDTH
         const textX = Math.round((CANVAS_WIDTH - width) / 2)
-        drawString(text, textX, textY, 1)
+        drawText(text, textX, textY)
         if (underline) {
-          gCtx.fillRect(textX, textY + FONT_HEIGHT, width, 1)
+          gCtx.fillRect(textX, textY + FONT_HEIGHT, width, FONT_SCALE)
         }
       }
 
