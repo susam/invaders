@@ -561,6 +561,7 @@
         drawShips()
         drawBoulders()
         drawPulse()
+        drawScaffolding()
       }
 
       let urlMinY
@@ -651,6 +652,17 @@
         }
         gCtx.fillStyle = pulse.color
         gCtx.fillRect(pulse.x, pulse.y, 4, 30)
+      }
+
+      function drawScaffolding () {
+        if (!LOGGING_ENABLED) {
+          return
+        }
+        gCtx.fillStyle = '#f00'
+        for (let i = 0; i <= 10; i++) {
+          const y = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i
+          gCtx.fillRect(0, y, CANVAS_WIDTH, 1)
+        }
       }
 
       // Info screen displayed when a game ends.
