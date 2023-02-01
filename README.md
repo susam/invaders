@@ -75,9 +75,9 @@ Technical Details
 
 All of the graphics is done by drawing rectangles on an HTML5
 `<canvas>` element using the Canvas API. In fact, any text appearing
-on the canvas is also written by drawing rectangles on the canvas. The
-bitmap arrays used to draw the rectangles for displaying text are
-available at [github.com/susam/pcface](https://github.com/susam/pcface).
+on the canvas is also written by drawing squares on the canvas. The
+bitmap arrays used to draw text are available at
+[github.com/susam/pcface](https://github.com/susam/pcface).
 
 All of the audio is done by playing sine waves generated using
 `OscillatorNode` of the Web Audio API. The sine waves used for the
@@ -254,4 +254,5 @@ Release Checklist
 - Run: git push origin main $VERSION
 - Run: npm login
 - Run: npm publish
+- Create a new release on GitHub.
 -->
