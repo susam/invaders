@@ -7,11 +7,8 @@
     "invaders.html"
   ],
   "keywords": [
-    "dos",
-    "cp437",
-    "font",
-    "glyph",
-    "typeface",
+    "game",
+    "invaders",
     "browser"
   ],
   "homepage": "https://github.com/susam/invaders",
@@ -25,5 +22,5 @@
   },
   "scripts": {
     "lint": "standard --plugin html *.html"
-  },
+  }
 }

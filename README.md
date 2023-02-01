@@ -73,8 +73,11 @@ browsers.
 Technical Details
 -----------------
 
-All of the graphics is done by drawing rectangles and text on an HTML5
-`<canvas>` element using the Canvas API.
+All of the graphics is done by drawing rectangles on an HTML5
+`<canvas>` element using the Canvas API. In fact, any text appearing
+on the canvas is also written by drawing rectangles on the canvas. The
+bitmap arrays used to draw the rectangles for displaying text are
+available at [github.com/susam/pcface](https://github.com/susam/pcface).
 
 All of the audio is done by playing sine waves generated using
 `OscillatorNode` of the Web Audio API. The sine waves used for the
@@ -232,3 +235,22 @@ Support
 To report bugs or ask questions, [create issues][ISSUES].
 
 [ISSUES]: https://github.com/susam/invaders/issues
+
+
+<!--
+Release Checklist
+-----------------
+
+- Update version in package.json.
+- Update copyright in invaders.html.
+- Update copyright in LICENSE.md.
+- Update CHANGES.md.
+- Run: npm run lint
+- Run: git status; git add -p
+- Run: VERSION=<VERSION>
+- Run: git commit -em "Set version to $VERSION"
+- Run: git tag $VERSION -m "Andromeda Invaders $VERSION"
+- Run: git push origin main $VERSION
+- Run: npm login
+- Run: npm publish
+-->
