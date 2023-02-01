@@ -506,7 +506,7 @@
         } else {
           pulse.y -= PULSE_MOVE_STEP
         }
-        if (PLAYER_Y - pulse.y <= 2 * PULSE_MOVE_STEP) {
+        if (pulse.y + PULSE_HEIGHT >= PLAYER_Y) {
           pulse.x = player.x + PULSE_X_OFFSET
         }
       }
