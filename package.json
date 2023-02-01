@@ -1,0 +1,29 @@
+{
+  "name": "invaders",
+  "version": "0.3.0",
+  "description": "Bitmap arrays for CP437 glyphs",
+  "main": "invaders.html",
+  "files": [
+    "invaders.html"
+  ],
+  "keywords": [
+    "dos",
+    "cp437",
+    "font",
+    "glyph",
+    "typeface",
+    "browser"
+  ],
+  "homepage": "https://github.com/susam/invaders",
+  "bugs": "https://github.com/susam/invaders/issues",
+  "license": "MIT",
+  "author": "Susam Pal (https://susam.net/)",
+  "repository": "github:susam/invaders",
+  "devDependencies": {
+    "standard": "latest",
+    "eslint-plugin-html": "latest"
+  },
+  "scripts": {
+    "lint": "standard --plugin html *.html"
+  },
+}

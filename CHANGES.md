@@ -10,6 +10,12 @@ Changelog
 - Toggle symbol on play/pause button depending on play/pause state.
 - Draw text using rectangles.
 - Skip playing chords if audio context is suspended.
+- Render score and info text by drawing rectangles.
+
+
+### Fix
+
+- Pulse now follows player until it detaches from the player.
 
 
 0.3.0 (2022-03-02)
