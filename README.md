@@ -7,11 +7,11 @@ a modern web browser. This game is inspired by Space Invaders, the
 characters, gameplay, and some technical aspects of this game are very
 different from those of Space Invaders.
 
-[![IMG][IMG]][PLAY1]
+[![A player emitting laser pulse and ten spaceships hovering][IMG]][PLAY1]
 
 **[PLAY NOW!][PLAY1]**
 
-[IMG]: https://i.imgur.com/92l0Fct.png
+[IMG]: https://susam.github.io/blob/img/invaders/invaders-v0.4.0.png
 
 
 Contents
@@ -241,16 +241,16 @@ More
 ----
 
 This project uses bitmap arrays to render text by drawing squares on
-canvas. The bitmap of only those characters that are needed in this
+canvas. The bitmaps of only those characters that are needed in this
 game are included in the source code. This includes the bitmap of ten
-digits, a few punctuation characters, and a very limited set of
+digits, a few punctuation characters, and a very limited subset of
 uppercase and lowercase letters.
 
 The glyphs for these characters are taken from a raster font named
 [Modern DOS 8x16][MDOS] version 20190101.02. This font was developed
 by Jayvee Enaguas and it is available under the terms of [CC0 1.0
-Universal (CC0 1.0) Public Domain Dedication][CC0]. This font is based
-on the [IBM VGA 8x16][VGA] and [Verite 8x16][VERITE] OEM fonts.
+Universal Public Domain Dedication][CC0]. This font is based on the
+[IBM VGA 8x16][VGA] and [Verite 8x16][VERITE] OEM fonts.
 
 If you are doing something similar and want the bitmap arrays for a
 larger set of characters, see another project of mine named [PC
