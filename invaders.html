@@ -402,6 +402,7 @@
         pulse.x = player.x + PULSE_X_OFFSET
         pulse.y = player.y + PULSE_Y_OFFSET
         pulse.color = playerColor()
+        pulse.hit = false
         pulse.live = true
         log('reset pulse')
       }
@@ -479,6 +480,7 @@
         processShipHits()
         processBoulderHits()
         processPlayerHit()
+        processPulseHit()
         if (shipsAlive === 0) {
           newGameLevel()
         }
@@ -825,6 +827,7 @@
             // C major
             playChord([C3, C4, E4, G4, C5], 0, HIT_DURATION, HIT_VOLUME)
             boulder.hit = true
+            pulse.hit = true
             log('boulder', i, 'is hit')
           }
         }
@@ -892,11 +895,17 @@
           }
           if (boulder.hit) {
             boulder.hit = false
-            pulse.live = false
             boulder.live = false
             player.score++
             log('boulder hit processed')
           }
+        }
+      }
+
+      function processPulseHit () {
+        if (pulse.hit) {
+          pulse.hit = false
+          pulse.live = false
         }
       }
 

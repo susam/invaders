@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.5.0 (UNRELEASED)
+------------------
+
+### Fix
+
+- An emitted pulse now remains alive when player is hit by a boulder.
+
+
 0.4.0 (2023-02-01)
 ------------------
 
