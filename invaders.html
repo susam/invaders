@@ -1,5 +1,5 @@
 <!--
-  Andromeda Invaders 0.4.0
+  Andromeda Invaders 0.5.0-dev
   Copyright (c) 2022-2023 Susam Pal
   Source: https://github.com/susam/invaders
   License: MIT
@@ -44,7 +44,7 @@
 
       // Metadata for info screen.
       const NAME = 'Andromeda Invaders'
-      const VERSION = '0.4.0'
+      const VERSION = '0.5.0-dev'
       const COPYRIGHT = 'Copyright (c) 2022-2023 Susam Pal'
       const LICENSE = 'Licensed under the MIT License'
       const SOURCE_URL = 'https://github.com/susam/invaders'
@@ -59,7 +59,8 @@
       const PLAY_SYMBOL = '&#x25ba;'
       const PAUSE_SYMBOL = '&#x25a0;'
 
-      const LOGGING_ENABLED = false
+      const LOGGING_ENABLED = true
+      const SCAFFOLDING_ENABLED = false
 
       // Graphics dimensions.
       const PADDING = 10
@@ -72,7 +73,7 @@
       const FONT_TOP_BLANK = 2 * FONT_SCALE
 
       const SCORE_Y = PADDING - FONT_TOP_BLANK
-      const TOP_SHIP_Y = 40
+      const SPACE_Y = 40
 
       const PLAYER_WIDTH = 50
       const PLAYER_HEIGHT = 30
@@ -93,6 +94,7 @@
       const SHIP_ROOF_OFFSET = (SHIP_WIDTH - SHIP_ROOF_WIDTH) / 2
       const SHIP_BODY_HEIGHT = SHIP_HEIGHT - 2 * SHIP_ROOF_HEIGHT
       const SHIP_LANE_HEIGHT = 35
+      const SHIP_MAX_Y = PLAYER_Y - SHIP_ROOF_HEIGHT
 
       const BOULDER_WIDTH = 6
       const BOULDER_HEIGHT = 6
@@ -160,8 +162,10 @@
 
       // Game states.
       let shipsAlive
+      let nearestShipAlive
       let state
       let level
+      let shipDescent = 0
 
       // User interface states.
       let leftTimer
@@ -186,6 +190,8 @@
                           '; score: ' + player.score +
                           '; health: ' + player.health +
                           '; ships: ' + shipsAlive +
+                          '; nearest: ' + nearestShipAlive +
+                          '; descent: ' + shipDescent.toFixed(3) +
                           '; ')
           console.log(prefix + args.join(' '))
         }
@@ -305,7 +311,8 @@
       }
 
       function resizeButtons (start, len, height, padding) {
-        const width = Math.max((scaledCanvasWidth - (len - 1) * padding) / len, 40)
+        const scaledWidth = (scaledCanvasWidth - (len - 1) * padding) / len
+        const width = Math.max(scaledWidth, 40)
         for (let i = start; i < start + len; i++) {
           const button = buttonList[i]
           button.style.height = height + 'px'
@@ -330,7 +337,7 @@
         log('reset game')
       }
 
-      function newGameLevel () {
+      function newLevel () {
         if (level === 1000) {
           level = 1
         } else {
@@ -339,6 +346,7 @@
         resetPulse()
         resetShips()
         resetBoulders()
+        drawGame()
         log('created game level', level)
       }
 
@@ -355,6 +363,7 @@
         state = ENDED
         clearTimeout(gTimer)
         clearTimeout(aTimer)
+        buttonPause.innerHTML = PLAY_SYMBOL
         log('stopped game')
       }
 
@@ -390,19 +399,17 @@
         player.x = PADDING
         player.y = PLAYER_Y
         player.health = PLAYER_COLORS.length
-        player.hit = false
         player.repairySinceScore = 0
         log('reset player; x: ' + player.x + '; y: ' + player.y)
       }
 
       function resetPulse () {
-        if (player.health === 0) {
+        if (player.health <= 0) {
           return
         }
         pulse.x = player.x + PULSE_X_OFFSET
         pulse.y = player.y + PULSE_Y_OFFSET
         pulse.color = playerColor()
-        pulse.hit = false
         pulse.live = true
         log('reset pulse')
       }
@@ -411,19 +418,20 @@
         const shipSpeed = Math.min(Math.floor((level + 6) / 3), 8)
         shipsAlive = (level <= 2) ? (3 * level) : 10
         ships = []
+        shipDescent = 0
         for (let i = 0; i < shipsAlive; i++) {
           const ship = {}
           ship.x = random(PADDING, CANVAS_WIDTH - PADDING - SHIP_WIDTH)
-          ship.y = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i
+          ship.y = SPACE_Y + Math.floor(shipDescent) + SHIP_LANE_HEIGHT * i
           ship.direction = random(0, 1) === 0 ? -1 : 1
           ship.health = SHIP_COLORS.length
           ship.speed = shipSpeed
           ship.repaired = 0
-          ship.hit = false
           ships.push(ship)
           log('ship ' + i + '; x: ' + ship.x + '; y: ' + ship.y +
               '; height: ' + SHIP_HEIGHT)
         }
+        updateNearestShipAlive()
         log('reset', shipsAlive, 'ships with speed', shipSpeed)
       }
 
@@ -446,7 +454,6 @@
           boulder.y = ship.y + BOULDER_Y_OFFSET
           boulder.color = shipColor(ship)
           boulder.speed = random(minSpeed, maxSpeed)
-          boulder.hit = false
           boulder.live = true
         } else {
           boulder.live = false
@@ -477,25 +484,21 @@
 
       // Animation loop.
       function animate () {
-        processShipHits()
-        processBoulderHits()
-        processPlayerHit()
-        processPulseHit()
-        if (shipsAlive === 0) {
-          newGameLevel()
-        }
-        repairPlayer()
         movePulse()
         moveShips()
         moveBoulders()
-        checkShipHits()
-        checkBoulderHits()
-        checkPlayerHit()
         drawGame()
-        if (player.health === 0) {
+        if (player.health <= 0) {
           stopGame()
           return
         }
+        if (shipsAlive === 0) {
+          newLevel()
+        }
+        checkShipHits()
+        checkBoulderHits()
+        checkPlayerHit()
+        repairPlayer()
         gTimer = setTimeout(animate, REFRESH_INTERVAL)
       }
 
@@ -508,28 +511,48 @@
         } else {
           pulse.y -= PULSE_MOVE_STEP
         }
-        if (pulse.y + PULSE_HEIGHT >= PLAYER_Y) {
+        if (player.health > 0 && pulse.y + PULSE_HEIGHT >= PLAYER_Y) {
           pulse.x = player.x + PULSE_X_OFFSET
+          pulse.color = playerColor()
         }
       }
 
       function moveShips () {
+        if (shipsAlive > 0 &&
+            SPACE_Y + shipDescent + nearestShipAlive * SHIP_LANE_HEIGHT <
+            SHIP_MAX_Y) {
+          shipDescent += 1 / (1 + shipsAlive)
+        }
+
         for (let i = 0; i < ships.length; i++) {
           const ship = ships[i]
+
+          if (ship.health <= 0) {
+            continue
+          }
+
           ship.x += ship.direction * ship.speed
           if (ship.x < PADDING) {
             ship.x = PADDING
             ship.direction *= -1
-          } else if (ship.x >= CANVAS_WIDTH - PADDING - SHIP_WIDTH) {
+          } else if (ship.x > CANVAS_WIDTH - PADDING - SHIP_WIDTH) {
             ship.x = CANVAS_WIDTH - PADDING - SHIP_WIDTH
             ship.direction *= -1
           }
-          const minY = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i
-          const maxY = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i + 10
-          ship.y += random(-1, 1)
-          ship.y = bounded(ship.y, minY, maxY)
-          if (random(1, 100) === 1) {
-            ship.direction *= -1
+
+          const minY = SPACE_Y + Math.floor(shipDescent) + SHIP_LANE_HEIGHT * i
+          const maxY = minY + 10
+
+          if (ship.y < SHIP_MAX_Y) {
+            ship.y += random(-1, 1)
+            ship.y = bounded(ship.y, minY, maxY)
+            if (random(1, 100) === 1) {
+              ship.direction *= -1
+            }
+          } else {
+            ship.y = SHIP_MAX_Y
+            ship.speed = Math.max(4, ship.speed)
+            ship.direction = player.x >= ship.x ? 1 : -1
           }
         }
       }
@@ -593,7 +616,7 @@
       function drawShips () {
         for (let i = 0; i < ships.length; i++) {
           const ship = ships[i]
-          if (ship.health === 0) {
+          if (ship.health <= 0) {
             continue
           }
           gCtx.fillStyle = shipColor(ship)
@@ -627,7 +650,7 @@
       }
 
       function drawPlayer () {
-        if (player.health === 0) {
+        if (player.health <= 0) {
           return
         }
         gCtx.fillStyle = playerColor()
@@ -657,12 +680,27 @@
       }
 
       function drawScaffolding () {
-        if (!LOGGING_ENABLED) {
+        if (!SCAFFOLDING_ENABLED) {
           return
         }
+
+        gCtx.fillStyle = '#090'
+        gCtx.fillRect(0, SHIP_MAX_Y, CANVAS_WIDTH, 1)
+
+        for (let i = 0; i <= 10; i++) {
+          const y = SPACE_Y + SHIP_LANE_HEIGHT * i
+          gCtx.fillRect(0, y, CANVAS_WIDTH, 1)
+        }
+
+        gCtx.fillStyle = '#660'
+        for (let i = 0; i <= 10; i++) {
+          const y = SPACE_Y + SHIP_LANE_HEIGHT * i
+          gCtx.fillRect(0, y, CANVAS_WIDTH, 1)
+        }
+
         gCtx.fillStyle = '#f00'
         for (let i = 0; i <= 10; i++) {
-          const y = TOP_SHIP_Y + SHIP_LANE_HEIGHT * i
+          const y = SPACE_Y + Math.floor(shipDescent) + SHIP_LANE_HEIGHT * i
           gCtx.fillRect(0, y, CANVAS_WIDTH, 1)
         }
       }
@@ -796,7 +834,7 @@
       function checkShipHits () {
         for (let i = 0; i < ships.length; i++) {
           const ship = ships[i]
-          if (ship.health === 0) {
+          if (ship.health <= 0) {
             continue
           }
           const hitBetweenRoofs = overlap(
@@ -808,7 +846,13 @@
           if (hitBetweenRoofs || hitBetweenWings) {
             // F major
             playChord([F3, C4, F4, A4, F5], 0, HIT_DURATION, HIT_VOLUME)
-            ship.hit = true
+            pulse.live = false
+            ship.health--
+            if (ship.health <= 0) {
+              shipsAlive--
+              updateNearestShipAlive()
+            }
+            player.score += (SHIP_COLORS.length - ship.health) * 10
             log('ship', i, 'is hit')
           }
         }
@@ -826,19 +870,24 @@
           if (hit) {
             // C major
             playChord([C3, C4, E4, G4, C5], 0, HIT_DURATION, HIT_VOLUME)
-            boulder.hit = true
-            pulse.hit = true
+            boulder.live = false
+            pulse.live = false
+            player.score++
             log('boulder', i, 'is hit')
           }
         }
       }
 
       function checkPlayerHit () {
+        let playerHit = false
+
+        // Hit by boulders.
         for (let i = 0; i < boulders.length; i++) {
           const boulder = boulders[i]
           if (!boulder.live) {
             continue
           }
+
           const headHit = overlap(
             boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT,
             player.x + 2 * PLAYER_HEAD_SIZE,
@@ -857,65 +906,49 @@
             player.y + 2 * PLAYER_HEAD_SIZE,
             PLAYER_WIDTH,
             PLAYER_HEAD_SIZE)
+
           if (headHit || bodyHit || baseHit) {
-            // B diminished
-            playChord([B3, B4, D5, F5, B5], 0, 4 * HIT_DURATION, HIT_VOLUME)
-            boulder.hit = true
-            player.hit = true
+            playerHit = true
+            boulder.live = false
+            player.health--
+            player.repairySinceScore = player.score
             log('player hit by boulder', i)
           }
         }
-      }
 
-      function processShipHits () {
-        for (let i = 0; i < ships.length; i++) {
-          const ship = ships[i]
-          if (ship.health === 0) {
-            continue
+        // Hit by ship.
+        if (nearestShipAlive >= 0) {
+          const ship = ships[nearestShipAlive]
+          const hitByWing = overlap(
+            player.x + 2 * PLAYER_HEAD_SIZE, player.y,
+            PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE,
+            ship.x, ship.y + SHIP_ROOF_HEIGHT, SHIP_WIDTH, SHIP_BODY_HEIGHT)
+          const hitByBody = overlap(
+            player.x + 2 * PLAYER_HEAD_SIZE, player.y,
+            PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE,
+            ship.x + SHIP_ROOF_OFFSET, ship.y, SHIP_ROOF_WIDTH, SHIP_HEIGHT)
+
+          if (hitByWing || hitByBody) {
+            playerHit = true
+            ship.health = 0
+            player.health = 0
+            log('player hit by ship', nearestShipAlive)
           }
-          if (ship.hit) {
-            ship.hit = false
-            pulse.live = false
-            ship.health--
-            ship.repaired = 0
-            if (ship.health === 0) {
-              shipsAlive--
-            }
-            player.score += (SHIP_COLORS.length - ship.health) * 10
-            log('ship hit processed; ship health reduced to', ship.health)
-          }
+        }
+
+        if (playerHit) {
+          playChord([B3, B4, D5, F5, B5], 0, 4 * HIT_DURATION, HIT_VOLUME)
         }
       }
 
-      function processBoulderHits () {
-        for (let i = 0; i < boulders.length; i++) {
-          const boulder = boulders[i]
-          if (!boulder.live) {
-            continue
-          }
-          if (boulder.hit) {
-            boulder.hit = false
-            boulder.live = false
-            player.score++
-            log('boulder hit processed')
+      function updateNearestShipAlive () {
+        for (let i = ships.length - 1; i >= 0; i--) {
+          if (ships[i].health > 0) {
+            nearestShipAlive = i
+            return
           }
         }
-      }
-
-      function processPulseHit () {
-        if (pulse.hit) {
-          pulse.hit = false
-          pulse.live = false
-        }
-      }
-
-      function processPlayerHit () {
-        if (player.hit) {
-          player.hit = false
-          player.health--
-          player.repairySinceScore = player.score
-          log('player hit processed')
-        }
+        nearestShipAlive = -1
       }
 
       // User input handling.
@@ -1020,6 +1053,12 @@
           pauseGame()
         } else if (state === PAUSED) {
           startGame()
+        } else if (state === ENDED) {
+          drawInfo()
+          enableClickableInfo()
+        } else if (state === INFO) {
+          disableClickableInfo()
+          restartGame()
         }
       }
 

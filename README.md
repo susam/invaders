@@ -203,13 +203,14 @@ Why?
 I first came across Space Invaders in the 1990s in the computer
 laboratory of my lower secondary school. Soon after playing the game a
 few times, I wanted to develop a similar game of my own. However, the
-little GW-BASIC programming I knew then was insufficient to write
-anything more sophisticated than simple text-based input/output
-programs. I did write several simple text-based quiz and adventure
-games back then but a more sophisticated game with graphics and audio
-remained elusive. As years went by, I gradually forgot about it,
-learnt more mainstream languages like C, Python, Lisp, etc. and got
-into programming as a career.
+little GW-BASIC programming I knew and the very limited access to
+computers I had then was insufficient to write anything more
+sophisticated than simple text-based input/output programs. I did
+write several simple text-based quiz and adventure games back then but
+a more sophisticated game with graphics and audio remained elusive. As
+years went by, I gradually forgot about it, learnt more mainstream
+languages like C, Python, Lisp, etc. and got into programming as a
+career.
 
 Although it is 25 years too late, I decided to spend a weekend to
 fulfill my childhood desire to write my own Invaders-like game. This

@@ -4,6 +4,13 @@ Changelog
 0.5.0 (UNRELEASED)
 ------------------
 
+### Added
+
+- Ships descend as each level progresses.
+- The ship nearest to the player hits the player.
+- Game ends when a ship hits the player.
+
+
 ### Fix
 
 - An emitted pulse now remains alive when player is hit by a boulder.
