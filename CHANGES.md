@@ -11,6 +11,11 @@ Changelog
 - Game ends when a ship collides with the player.
 
 
+### Changed
+
+- After game ends, play button shows info screen before starting game.
+
+
 ### Fix
 
 - An emitted pulse now remains alive when player is hit by a boulder.
@@ -23,6 +28,7 @@ Changelog
 
 - Perform pixelated rendering to avoid anti-aliasing.
 - Toggle symbol on play/pause button depending on play/pause state.
+- Play button starts game after a new game is initialized.
 - Draw text using rectangles.
 - Skip playing chords if audio context is suspended.
 - Render score and info text by drawing rectangles.
