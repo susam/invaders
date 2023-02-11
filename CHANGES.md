@@ -7,8 +7,8 @@ Changelog
 ### Added
 
 - Ships descend as each level progresses.
-- The ship nearest to the player hits the player.
-- Game ends when a ship hits the player.
+- The lowest ship collides with the player.
+- Game ends when a ship collides with the player.
 
 
 ### Fix

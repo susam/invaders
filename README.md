@@ -121,12 +121,25 @@ perfectly healthy player is hit, it turns dark green. If the player is
 hit again while it is dark green, it turns dull yellow. If the player
 is hit when it is dull yellow, it vanishes and the game ends.
 
-To summarize, each ship has three grades of health and the player too
-has three grades of health. After being hit and losing health, the
-ships and the player can regain health as the game continues. A ship
-gains health by one grade after it drops ten boulders since it was
-last hit. The player gains health by one grade after it gains 100
-points since it was last hit.
+Further, as each game level progresses, the ships gradually descend.
+The fewer the number of ships that are still visible, the faster they
+descend. When the lowermost ship reaches the same level as that of the
+player, it moves rapidly in the direction of the player and collides
+with the player. When a ship collides with the player, the ship
+vanishes but so does the player and the game ends.
+
+
+### Health Levels
+
+Each ship has three grades of health and the player too has three
+grades of health. After being hit and losing health, the ships and the
+player can regain health as the game continues. A ship gains health by
+one grade after it drops ten boulders since it was last hit. The
+player gains health by one grade after it gains 100 points since it
+was last hit.
+
+When a ship collides with the player, the ship loses all its health
+and vanishes, so does the player, and the game ends immediately.
 
 
 ### Game Levels
@@ -272,6 +285,7 @@ Release Checklist
 - Update version in invaders.html (2 places).
 - Update copyright in invaders.html (2 places).
 - Update copyright in LICENSE.md.
+- Disable logging and scaffolding.
 - Update CHANGES.md.
 - Run: npm run lint
 - Run: git status; git add -p
