@@ -392,7 +392,6 @@
         const LEFT = 'left'
         const RIGHT = 'right'
 
-        let safe = true
         let decision = STAY
 
         if (startX < shiftedAimX) {
@@ -404,10 +403,9 @@
         const BOULDER_SCAN_HEIGHT = 100
         const BOULDER_SCAN_WIDTH = PLAYER_MOVE_STEP
 
-        let avoidLeft = []
-        let avoidRight = []
-        let avoidHere = []
-        let avoidHereAvg = 0
+        const avoidLeft = []
+        const avoidRight = []
+        const avoidHere = []
 
         for (let i = 0; i < boulders.length; i++) {
           const boulder = boulders[i]
@@ -416,7 +414,6 @@
               boulder.y <= CANVAS_HEIGHT - PADDING &&
               boulder.x >= player.x - BOULDER_SCAN_WIDTH - BOULDER_WIDTH &&
               boulder.x <= player.x + PLAYER_WIDTH + BOULDER_SCAN_WIDTH) {
-
             const coord = [boulder.x, boulder.y]
             if (boulder.x <= player.x - BOULDER_WIDTH) {
               avoidLeft.push(coord)
@@ -435,7 +432,7 @@
 
         if ((decision === LEFT && avoidLeft.length !== 0) ||
             (decision === RIGHT && avoidRight.length !== 0)) {
-           decision = STAY
+          decision = STAY
         }
 
         if (avoidHere.length !== 0) {
@@ -450,9 +447,9 @@
           }
         }
 
-        log((avoidLeft.length == 0 ? '' : 'avoidLeft: ' + avoidLeft + '; ') +
-            (avoidRight.length == 0 ? '' : 'avoidRight: ' + avoidRight + '; ') +
-            (avoidHere.length == 0 ? '' : 'avoidHere: ' + avoidHere + '; ') +
+        log((avoidLeft.length === 0 ? '' : 'avoidLeft: ' + avoidLeft + '; ') +
+            (avoidRight.length === 0 ? '' : 'avoidRight: ' + avoidRight + '; ') +
+            (avoidHere.length === 0 ? '' : 'avoidHere: ' + avoidHere + '; ') +
             'decision: ' + decision)
 
         if (decision === STAY) {
