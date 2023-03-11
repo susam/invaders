@@ -1,5 +1,5 @@
 <!--
-  Andromeda Invaders 0.5.0
+  Andromeda Invaders 0.6.0-dev
   Copyright (c) 2022-2023 Susam Pal
   Source: https://github.com/susam/invaders
   License: MIT
@@ -79,9 +79,10 @@
       const PLAYER_HEIGHT = 30
       const PLAYER_HEAD_SIZE = 10
       const PLAYER_Y = CANVAS_HEIGHT - PADDING - PLAYER_HEIGHT
+      const PLAYER_MAX_X = CANVAS_WIDTH - PADDING - PLAYER_WIDTH
       const PLAYER_MOVE_STEP = 5
 
-      const PULSE_WIDTH = 6
+      const PULSE_WIDTH = 4
       const PULSE_HEIGHT = 30
       const PULSE_X_OFFSET = (PLAYER_WIDTH - PULSE_WIDTH) / 2
       const PULSE_Y_OFFSET = 0
@@ -95,6 +96,7 @@
       const SHIP_BODY_HEIGHT = SHIP_HEIGHT - 2 * SHIP_ROOF_HEIGHT
       const SHIP_LANE_HEIGHT = 35
       const SHIP_MAX_Y = PLAYER_Y - SHIP_ROOF_HEIGHT
+      const SHIP_MAX_X = CANVAS_WIDTH - PADDING - SHIP_WIDTH
 
       const BOULDER_WIDTH = 6
       const BOULDER_HEIGHT = 6
@@ -136,6 +138,8 @@
       // Time intervals.
       const REFRESH_INTERVAL = 20
       const ACTION_REPEAT_INTERVAL = 20
+      const AUTO_PLAY_DELAY = 5000
+      const AUTO_PLAY_INTERVAL = 20
 
       // Initialization time for logging purpose.
       let initTime
@@ -174,6 +178,9 @@
       let rightOn = false
       let muted = false
 
+      // Auto-play.
+      let autoTimer
+
       // Game objects visible on screen.
       const player = {}
       const pulse = {}
@@ -188,6 +195,8 @@
                           '; state: ' + state +
                           '; level: ' + level +
                           '; score: ' + player.score +
+                          '; x: ' + player.x +
+                          '; y: ' + player.y +
                           '; health: ' + player.health +
                           '; ships: ' + shipsAlive +
                           '; nearest: ' + nearestShipAlive +
@@ -258,15 +267,15 @@
         document.addEventListener('keydown', readKeyDown)
         document.addEventListener('keyup', readKeyUp)
 
-        buttonLeft.addEventListener('mousedown', startLeft)
-        buttonLeft.addEventListener('mouseup', stopLeft)
-        buttonLeft.addEventListener('touchstart', startLeft)
-        buttonLeft.addEventListener('touchend', stopLeft)
+        buttonLeft.addEventListener('mousedown', actionStartLeft)
+        buttonLeft.addEventListener('mouseup', actionStopLeft)
+        buttonLeft.addEventListener('touchstart', actionStartLeft)
+        buttonLeft.addEventListener('touchend', actionStopLeft)
 
-        buttonRight.addEventListener('mousedown', startRight)
-        buttonRight.addEventListener('mouseup', stopRight)
-        buttonRight.addEventListener('touchstart', startRight)
-        buttonRight.addEventListener('touchend', stopRight)
+        buttonRight.addEventListener('mousedown', actionStartRight)
+        buttonRight.addEventListener('mouseup', actionStopRight)
+        buttonRight.addEventListener('touchstart', actionStartRight)
+        buttonRight.addEventListener('touchend', actionStopRight)
 
         buttonEnter.addEventListener('click', actionEnter)
         buttonEnter.addEventListener('touchstart', actionEnter)
@@ -334,6 +343,7 @@
         resetPulse()
         resetShips()
         resetBoulders()
+        autoTimer = setTimeout(autoPlay, AUTO_PLAY_DELAY)
         log('reset game')
       }
 
@@ -350,13 +360,129 @@
         log('created game level', level)
       }
 
-      function startGame () {
+      function autoPlay () {
+        if (state === ENDED || state === INFO) {
+          stopRight()
+          stopLeft()
+          return
+        } else if (state === PAUSED) {
+          stopRight()
+          stopLeft()
+        } else if (state === INITIALIZED) {
+          startRight()
+        } else if (shipsAlive > 0) {
+          autoMove()
+        }
+        autoTimer = setTimeout(autoPlay, AUTO_PLAY_INTERVAL)
+      }
+
+      function autoMove () {
+        const startX = player.x + PLAYER_WIDTH / 2
+        const startY = PLAYER_Y - PULSE_HEIGHT
+
+        const ship = ships[nearestShipAlive]
+        const aimX = ship.x + SHIP_WIDTH / 2
+        const aimY = ship.y + SHIP_HEIGHT / 2
+
+        const relativeSpeed = PULSE_MOVE_STEP + 1 / (1 + shipsAlive)
+        const travelTime = Math.floor((startY - aimY) / relativeSpeed)
+        const shiftedAimX = aimX + (ship.direction * ship.speed * travelTime)
+
+        const STAY = 'stay'
+        const LEFT = 'left'
+        const RIGHT = 'right'
+
+        let safe = true
+        let decision = STAY
+
+        if (startX < shiftedAimX) {
+          decision = RIGHT
+        } else if (startX > shiftedAimX) {
+          decision = LEFT
+        }
+
+        const BOULDER_SCAN_HEIGHT = 100
+        const BOULDER_SCAN_WIDTH = PLAYER_MOVE_STEP
+
+        let avoidLeft = []
+        let avoidRight = []
+        let avoidHere = []
+        let avoidHereAvg = 0
+
+        for (let i = 0; i < boulders.length; i++) {
+          const boulder = boulders[i]
+          if (boulder.live &&
+              boulder.y >= PLAYER_Y - BOULDER_SCAN_HEIGHT &&
+              boulder.y <= CANVAS_HEIGHT - PADDING &&
+              boulder.x >= player.x - BOULDER_SCAN_WIDTH - BOULDER_WIDTH &&
+              boulder.x <= player.x + PLAYER_WIDTH + BOULDER_SCAN_WIDTH) {
+
+            const coord = [boulder.x, boulder.y]
+            if (boulder.x <= player.x - BOULDER_WIDTH) {
+              avoidLeft.push(coord)
+            } else if (boulder.x >= player.x + PLAYER_WIDTH) {
+              avoidRight.push(coord)
+            } else {
+              avoidHere.push(coord)
+              if (boulder.x <= PADDING + PLAYER_WIDTH) {
+                avoidLeft.push(coord)
+              } else if (boulder.y >= PLAYER_MAX_X) {
+                avoidRight.push(coord)
+              }
+            }
+          }
+        }
+
+        if ((decision === LEFT && avoidLeft.length !== 0) ||
+            (decision === RIGHT && avoidRight.length !== 0)) {
+           decision = STAY
+        }
+
+        if (avoidHere.length !== 0) {
+          if (avoidLeft.length === 0) {
+            decision = LEFT
+          } else if (avoidRight.length === 0) {
+            decision = RIGHT
+          } else if (player.x <= CANVAS_WIDTH / 2) {
+            decision = RIGHT
+          } else {
+            decision = LEFT
+          }
+        }
+
+        log((avoidLeft.length == 0 ? '' : 'avoidLeft: ' + avoidLeft + '; ') +
+            (avoidRight.length == 0 ? '' : 'avoidRight: ' + avoidRight + '; ') +
+            (avoidHere.length == 0 ? '' : 'avoidHere: ' + avoidHere + '; ') +
+            'decision: ' + decision)
+
+        if (decision === STAY) {
+          stopLeft()
+          stopRight()
+        } else if (decision === LEFT) {
+          stopRight()
+          startLeft()
+        } else if (decision === RIGHT) {
+          stopLeft()
+          startRight()
+        }
+      }
+
+      function playGame () {
         state = PLAYING
         initAudio()
         startMusic()
         animate()
         buttonPause.innerHTML = PAUSE_SYMBOL
         log('started game')
+      }
+
+      function startGame () {
+        clearTimeout(autoTimer)
+        playGame()
+      }
+
+      function resumeGame () {
+        playGame()
       }
 
       function stopGame () {
@@ -421,7 +547,7 @@
         shipDescent = 0
         for (let i = 0; i < shipsAlive; i++) {
           const ship = {}
-          ship.x = random(PADDING, CANVAS_WIDTH - PADDING - SHIP_WIDTH)
+          ship.x = random(PADDING, SHIP_MAX_X)
           ship.y = SPACE_Y + Math.floor(shipDescent) + SHIP_LANE_HEIGHT * i
           ship.direction = random(0, 1) === 0 ? -1 : 1
           ship.health = SHIP_COLORS.length
@@ -535,8 +661,8 @@
           if (ship.x < PADDING) {
             ship.x = PADDING
             ship.direction *= -1
-          } else if (ship.x > CANVAS_WIDTH - PADDING - SHIP_WIDTH) {
-            ship.x = CANVAS_WIDTH - PADDING - SHIP_WIDTH
+          } else if (ship.x > SHIP_MAX_X) {
+            ship.x = SHIP_MAX_X
             ship.direction *= -1
           }
 
@@ -676,7 +802,7 @@
           return
         }
         gCtx.fillStyle = pulse.color
-        gCtx.fillRect(pulse.x, pulse.y, 4, 30)
+        gCtx.fillRect(pulse.x, pulse.y, PULSE_WIDTH, PULSE_HEIGHT)
       }
 
       function drawScaffolding () {
@@ -954,9 +1080,9 @@
       // User input handling.
       function readKeyDown (e) {
         if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
-          startLeft(e)
+          actionStartLeft(e)
         } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
-          startRight(e)
+          actionStartRight(e)
         } else if (e.code === 'KeyP' || e.code === 'Space') {
           actionPause(e)
         } else if (e.code === 'KeyE' || e.code === 'Enter') {
@@ -970,36 +1096,52 @@
 
       function readKeyUp (e) {
         if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
-          stopLeft(e)
+          actionStopLeft(e)
         } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
-          stopRight(e)
+          actionStopRight(e)
         }
       }
 
-      function startLeft (e) {
+      function actionStartLeft (e) {
         e.preventDefault()
+        startLeft()
+      }
+
+      function actionStartRight (e) {
+        e.preventDefault()
+        startRight()
+      }
+
+      function actionStopLeft (e) {
+        e.preventDefault()
+        stopLeft()
+      }
+
+      function actionStopRight (e) {
+        e.preventDefault()
+        stopRight()
+      }
+
+      function startLeft () {
         if (!leftOn) {
           leftOn = true
           moveLeft()
         }
       }
 
-      function stopLeft (e) {
-        e.preventDefault()
-        leftOn = false
-        clearTimeout(leftTimer)
-      }
-
-      function startRight (e) {
-        e.preventDefault()
+      function startRight () {
         if (!rightOn) {
           rightOn = true
           moveRight()
         }
       }
 
-      function stopRight (e) {
-        e.preventDefault()
+      function stopLeft () {
+        leftOn = false
+        clearTimeout(leftTimer)
+      }
+
+      function stopRight () {
         rightOn = false
         clearTimeout(rightTimer)
       }
@@ -1017,10 +1159,9 @@
       }
 
       function moveRight () {
-        const rightEdge = CANVAS_WIDTH - PLAYER_WIDTH - PADDING
         if (state === INITIALIZED) {
           startGame()
-        } else if (state !== PLAYING || player.x === rightEdge) {
+        } else if (state !== PLAYING || player.x === PLAYER_MAX_X) {
           return
         }
         player.x += PLAYER_MOVE_STEP
@@ -1052,7 +1193,7 @@
         } else if (state === PLAYING) {
           pauseGame()
         } else if (state === PAUSED) {
-          startGame()
+          resumeGame()
         } else if (state === ENDED) {
           drawInfo()
           enableClickableInfo()
