@@ -1,12 +1,12 @@
 Changelog
 =========
 
-0.6.0 (UNRELEASED)
+0.6.0 (2023-03-11)
 ------------------
 
 ### Added
 
-- Automatic gameplay after 5 seconds of idle time.
+- Automatic play after 5 seconds of idle time.
 
 
 0.5.0 (2023-02-11)

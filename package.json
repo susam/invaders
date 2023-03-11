@@ -1,6 +1,6 @@
 {
   "name": "invaders",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Bitmap arrays for CP437 glyphs",
   "main": "invaders.html",
   "files": [
