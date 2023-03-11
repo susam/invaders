@@ -11,7 +11,7 @@ different from those of Space Invaders.
 
 **[PLAY NOW!][PLAY1]**
 
-[IMG]: https://susam.github.io/blob/img/invaders/invaders-v0.4.0.png
+[IMG]: https://susam.github.io/blob/img/invaders/invaders-v0.6.0.png
 
 
 Contents
