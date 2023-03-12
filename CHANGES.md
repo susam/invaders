@@ -1,12 +1,26 @@
 Changelog
 =========
 
+0.7.0 (UNRELEASED)
+------------------
+
+### Added
+
+- Display time elapsed in top-right corner.
+
+
 0.6.0 (2023-03-11)
 ------------------
 
 ### Added
 
 - Automatic play after 5 seconds of idle time.
+
+
+### Fixed
+
+- Pulse start position is now accurately horizontally centred within
+  the player.
 
 
 0.5.0 (2023-02-11)
@@ -24,7 +38,7 @@ Changelog
 - After game ends, play button shows info screen before starting game.
 
 
-### Fix
+### Fixed
 
 - An emitted pulse now remains alive when player is hit by a boulder.
 
@@ -42,7 +56,7 @@ Changelog
 - Render score and info text by drawing rectangles.
 
 
-### Fix
+### Fixed
 
 - Pulse now follows player until it detaches from the player.
 

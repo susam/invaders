@@ -1,5 +1,5 @@
 <!--
-  Andromeda Invaders 0.6.0
+  Andromeda Invaders 0.7.0-dev
   Copyright (c) 2022-2023 Susam Pal
   Source: https://github.com/susam/invaders
   License: MIT
@@ -141,8 +141,10 @@
       const AUTO_PLAY_DELAY = 5000
       const AUTO_PLAY_INTERVAL = 20
 
-      // Initialization time for logging purpose.
+      // Time logging and display.
       let initTime
+      let startTime
+      let timeUntilPreviousPause
 
       // Graphics and audio contexts.
       let canvas
@@ -343,6 +345,8 @@
         resetPulse()
         resetShips()
         resetBoulders()
+        startTime = -1
+        timeUntilPreviousPause = 0
         autoTimer = setTimeout(autoPlay, AUTO_PLAY_DELAY)
         log('reset game')
       }
@@ -466,6 +470,7 @@
 
       function playGame () {
         state = PLAYING
+        startTime = Date.now()
         initAudio()
         startMusic()
         animate()
@@ -492,6 +497,7 @@
 
       function pauseGame () {
         state = PAUSED
+        timeUntilPreviousPause += Date.now() - startTime
         clearTimeout(gTimer)
         clearTimeout(aTimer)
         buttonPause.innerHTML = PLAY_SYMBOL
@@ -705,6 +711,7 @@
       function drawGame () {
         drawBackground()
         drawScore()
+        drawTime()
         drawPlayer()
         drawShips()
         drawBoulders()
@@ -734,6 +741,33 @@
       function drawScore () {
         const text = player.score + ' (L' + level + ')'
         drawText(text, PADDING, SCORE_Y)
+      }
+
+      function drawTime () {
+        if (startTime === -1) {
+          return
+        }
+        const ms = timeUntilPreviousPause + Date.now() - startTime
+        const ds = Math.floor(ms / 100) % 10
+        const ss = Math.floor(ms / 1000) % 60
+        const mm = Math.floor(ms / 1000 / 60) % 60
+        const hh = Math.floor(ms / 1000 / 60 / 60)
+
+        const ssStr = (ss < 10 ? '0' : '') + ss
+        const mmStr = (mm < 10 ? '0' : '') + mm
+        const hhStr = (hh < 10 ? '0' : '') + hh
+
+        let text
+        if (hh > 0) {
+          text = hhStr + ':' + mmStr + ':' + ssStr + '.' + ds
+        } else if (mm > 0) {
+          text = mmStr + ':' + ssStr + '.' + ds
+        } else {
+          text = ss + '.' + ds
+        }
+
+        const x = CANVAS_WIDTH - PADDING - FONT_WIDTH * text.length
+        drawText(text, x, SCORE_Y)
       }
 
       function drawShips () {
@@ -930,21 +964,21 @@
         }
         const gain = aCtx.createGain()
         const timeConstant = Math.min(duration, 0.200) / 3
-        const startTime = aCtx.currentTime + delay
-        const stopTime = startTime + 10 * timeConstant
+        const beginTime = aCtx.currentTime + delay
+        const endTime = beginTime + 10 * timeConstant
         gain.connect(compressor)
         for (let i = 0; i < frequencies.length; i++) {
           const oscillator = aCtx.createOscillator()
           oscillator.frequency.value = frequencies[i]
-          gain.gain.setValueAtTime(muted ? 0 : volume, startTime)
-          gain.gain.setTargetAtTime(0, startTime, timeConstant)
+          gain.gain.setValueAtTime(muted ? 0 : volume, beginTime)
+          gain.gain.setTargetAtTime(0, beginTime, timeConstant)
           oscillator.connect(gain)
-          oscillator.start(startTime)
-          oscillator.stop(stopTime)
+          oscillator.start(beginTime)
+          oscillator.stop(endTime)
           setTimeout(function () {
             oscillator.disconnect()
             gain.disconnect()
-          }, (stopTime + 1) * 1000)
+          }, (endTime + 1) * 1000)
         }
       }
 
