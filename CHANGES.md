@@ -9,6 +9,11 @@ Changelog
 - Display time elapsed in top-right corner.
 
 
+### Fixed
+
+- Resetting the game now restarts autoplay delay timer.
+
+
 0.6.0 (2023-03-11)
 ------------------
 

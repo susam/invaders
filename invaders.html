@@ -347,6 +347,7 @@
         resetBoulders()
         startTime = -1
         timeUntilPreviousPause = 0
+        clearTimeout(autoTimer)
         autoTimer = setTimeout(autoPlay, AUTO_PLAY_DELAY)
         log('reset game')
       }
