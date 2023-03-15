@@ -9,6 +9,24 @@ Changelog
 - Display time elapsed in top-right corner.
 
 
+### Changed
+
+- Autoplay algorithm considers boulder speeds and time to possible
+  impact while scanning airspace and avoiding boulders. This often
+  allows the boulders to get closer to the player than it was possible
+  in the previous version while still keeping the player safe. This
+  allows additional time and more flexibility to the player to move
+  around during autoplay.
+- While escaping a boulder directly on top, if the player gets stuck
+  once while moving left, the autoplay algorithm remembers that and
+  avoids moving left again until it safely clears the falling boulder.
+  This allows the algorithm to avoid oscillating between left moves
+  and right moves in certain circumstances.
+- While escaping a boulder directly on top, if the autoplay algorithm
+  cannot find any move to avoid the boulder, it aims directly at the
+  boulder in an attempt to hit and remove the boulder.
+
+
 ### Fixed
 
 - Resetting the game now restarts autoplay delay timer.
