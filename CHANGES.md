@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.7.1 (2023-03-16)
+
+### Fixed
+
+- Fix version in the information screen.
+
+
 0.7.0 (2023-03-15)
 ------------------
 
