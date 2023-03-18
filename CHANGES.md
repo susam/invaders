@@ -1,7 +1,19 @@
 Changelog
 =========
 
+0.8.0 (2023-03-18)
+------------------
+
+### Changed
+
+- Autoplay algorithm now aims slightly to the left or the right of the
+  centre of the nearest ship to avoid hitting recently released
+  boulders and losing time that could be better utilized for hitting
+  the nearest ship.
+
+
 0.7.1 (2023-03-16)
+------------------
 
 ### Fixed
 
