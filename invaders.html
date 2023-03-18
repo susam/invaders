@@ -413,11 +413,11 @@
           }
         }
 
-        // Estimated centre of ship when pulse reaches ship.
-        const startX = player.x + PLAYER_WIDTH / 2
+        // Estimated hit spot position of nearest ship.
+        const startX = player.x + PULSE_X_OFFSET
         const startY = PLAYER_Y - PULSE_HEIGHT
         const ship = ships[nearestShipAlive]
-        const aimX = ship.x + SHIP_WIDTH / 2
+        const aimX = ship.x + BOULDER_X_OFFSET - PULSE_WIDTH
         const aimY = ship.y + SHIP_HEIGHT / 2
         const relativeSpeed = PULSE_MOVE_STEP + 1 / (1 + shipsAlive)
         const travelTime = Math.floor((startY - aimY) / relativeSpeed)
