@@ -21,6 +21,7 @@ Contents
 * [Keys](#keys)
 * [Technical Details](#technical-details)
 * [Gameplay](#gameplay)
+* [Autoplay](#autoplay)
 * [Why?](#why)
 * [License](#license)
 * [Support](#support)
@@ -203,11 +204,36 @@ can be played indefinitely long in theory. However, in practice you
 might find that it is quite difficult to reach even level 10 or so.
 
 
-### Game Points
+### Points
 
 The player gets 1 point for hitting a boulder, 10 points for hitting a
 bright orange ship, 20 points for hitting a dark orange ship, and 30
 points for hitting a dark red ship.
+
+
+Autoplay
+--------
+
+This game comes with an autoplay feature. After the game loads on the
+web browser or after the game is restarted, when there is no activity
+for 5 seconds, the autoplay algorithm starts and begins playing the
+game on its own.
+
+To see the autoplay algorithm in action, load or restart the game,
+press <kbd>enter</kbd> twice, and wait for 5 seconds.
+
+Pressing <kbd>enter</kbd> twice is not strictly necessary for the
+autoplay algorithm to begin. The autoplay algorithm starts
+automatically 5 seconds after a game is loaded or restarted regardless
+of whether you press <kbd>enter</kbd> or not. However, if you don't
+perform some kind of user interaction with the web page, such as by
+pressing a key or clicking with a mouse or with touch, before the
+autoplay begins, then the web browser may refuse to play the game
+audio. That is why typing some key that does not start a normal game
+or clicking with the mouse or some other user activity is necessary to
+ensure that when the autoplay algorithm starts, the game audio plays
+as well. Pressing <kbd>enter</kbd> twice happens to restart the game
+happens to be one such convenient user interaction.
 
 
 Why?
