@@ -1,5 +1,5 @@
 <!--
-  Andromeda Invaders 0.8.0
+  Andromeda Invaders 0.9.0-dev
   Copyright (c) 2022-2023 Susam Pal
   Source: https://github.com/susam/invaders
   License: MIT
@@ -14,29 +14,26 @@
         background: #111;
         margin: 0;
       }
-      canvas {
+      canvas, button {
         background: #000;
+        border: 1px solid #333;
+        box-sizing: border-box;
+      }
+      canvas {
         display: block;
         margin: 0 auto;
-        box-sizing: border-box;
-        border: 1px solid #333;
         image-rendering: pixelated;
       }
       div {
         text-align: center;
       }
       button {
-        background: #000;
         color: #999;
         font-size: 16px;
         font-weight: bold;
-        box-sizing: border-box;
-        border: 1px solid #333;
-        user-select: none;
         vertical-align: middle;
-        -moz-user-select: none;
+        user-select: none;
         -webkit-user-select: none;
-        -ms-user-select: none;
       }
     </style>
     <script>
