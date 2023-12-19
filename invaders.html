@@ -135,7 +135,8 @@
       // Time intervals.
       const REFRESH_INTERVAL = 20
       const ACTION_REPEAT_INTERVAL = 20
-      const AUTO_PLAY_DELAY = 5000
+      const AUTO_SHORT_DELAY = 1000
+      const AUTO_LONG_DELAY = 5000
       const AUTO_PLAY_INTERVAL = 20
 
       // Time logging and display.
@@ -178,6 +179,7 @@
       let muted = false
 
       // Auto-play.
+      let autoSoon
       let autoTimer
       let autoAllowLeft = true
 
@@ -218,6 +220,7 @@
       function init () {
         state = INITIALIZED
         initTime = Date.now()
+        autoSoon = window.location.hash === '#auto'
         initGraphics()
         initButtons()
         initEventListeners()
@@ -346,7 +349,11 @@
         startTime = -1
         timeUntilPreviousPause = 0
         clearTimeout(autoTimer)
-        autoTimer = setTimeout(autoPlay, AUTO_PLAY_DELAY)
+
+        const autoDelay = autoSoon ? AUTO_SHORT_DELAY : AUTO_LONG_DELAY
+        autoTimer = setTimeout(autoPlay, autoDelay)
+        autoSoon = false
+
         log('reset game')
       }
 

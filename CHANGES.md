@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.9.0 (2023-12-20)
+------------------
+
+### Added
+
+- Visiting invaders.html#auto starts autoplay quickly after a one
+  second delay.
+
+
 0.8.0 (2023-03-18)
 ------------------
 
