@@ -2,7 +2,7 @@
   Andromeda Invaders 0.9.0
   Copyright (c) 2022-2023 Susam Pal
   Source: https://github.com/susam/invaders
-  License: MIT
+  Licence: MIT
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -43,11 +43,11 @@
       const NAME = 'Andromeda Invaders'
       const VERSION = '0.8.0'
       const COPYRIGHT = 'Copyright (c) 2022-2023 Susam Pal'
-      const LICENSE = 'Licensed under the MIT License'
+      const LICENCE = 'Licenced under the MIT Licence'
       const SOURCE_URL = 'https://github.com/susam/invaders'
 
       // Lifecycle states.
-      const INITIALIZED = 'initialized'
+      const INITIALISED = 'initialised'
       const PLAYING = 'playing'
       const PAUSED = 'paused'
       const ENDED = 'ended'
@@ -100,9 +100,9 @@
       const BOULDER_X_OFFSET = (SHIP_WIDTH - BOULDER_WIDTH) / 2
       const BOULDER_Y_OFFSET = SHIP_HEIGHT - BOULDER_HEIGHT
 
-      // Color palettes.
-      const SHIP_COLORS = ['#f60', '#c30', '#900']
-      const PLAYER_COLORS = ['#0c0', '#390', '#660']
+      // Colour palettes.
+      const SHIP_COLOURS = ['#f60', '#c30', '#900']
+      const PLAYER_COLOURS = ['#0c0', '#390', '#660']
 
       // Audio parameters.
       const BACKGROUND_VOLUME = 1
@@ -216,9 +216,9 @@
         return Math.max(Math.min(x, max), min)
       }
 
-      // Game initialization.
+      // Game initialisation.
       function init () {
-        state = INITIALIZED
+        state = INITIALISED
         initTime = Date.now()
         autoSoon = window.location.hash === '#auto'
         initGraphics()
@@ -228,7 +228,7 @@
         resetGame()
         drawGame()
         buttonPause.innerHTML = PLAY_SYMBOL
-        log('initialized canvas')
+        log('initialised canvas')
       }
 
       function initGraphics () {
@@ -261,7 +261,7 @@
         aCtx = new window.AudioContext()
         compressor = aCtx.createDynamicsCompressor()
         compressor.connect(aCtx.destination)
-        log('initialized audio')
+        log('initialised audio')
       }
 
       function initEventListeners () {
@@ -378,7 +378,7 @@
         } else if (state === PAUSED) {
           stopRight()
           stopLeft()
-        } else if (state === INITIALIZED) {
+        } else if (state === INITIALISED) {
           startRight()
         } else if (shipsAlive > 0) {
           autoMove()
@@ -535,7 +535,7 @@
         if (state === PLAYING) {
           stopGame()
         }
-        state = INITIALIZED
+        state = INITIALISED
         resetGame()
         drawGame()
         buttonPause.innerHTML = PLAY_SYMBOL
@@ -543,18 +543,18 @@
       }
 
       // Functions to reset game object states.
-      function shipColor (ship) {
-        return SHIP_COLORS[SHIP_COLORS.length - ship.health]
+      function shipColour (ship) {
+        return SHIP_COLOURS[SHIP_COLOURS.length - ship.health]
       }
 
-      function playerColor () {
-        return PLAYER_COLORS[PLAYER_COLORS.length - player.health]
+      function playerColour () {
+        return PLAYER_COLOURS[PLAYER_COLOURS.length - player.health]
       }
 
       function resetPlayer () {
         player.x = PADDING
         player.y = PLAYER_Y
-        player.health = PLAYER_COLORS.length
+        player.health = PLAYER_COLOURS.length
         player.repairySinceScore = 0
         log('reset player; x: ' + player.x + '; y: ' + player.y)
       }
@@ -565,7 +565,7 @@
         }
         pulse.x = player.x + PULSE_X_OFFSET
         pulse.y = player.y + PULSE_Y_OFFSET
-        pulse.color = playerColor()
+        pulse.colour = playerColour()
         pulse.live = true
         log('reset pulse')
       }
@@ -580,7 +580,7 @@
           ship.x = random(PADDING, SHIP_MAX_X)
           ship.y = SPACE_Y + Math.floor(shipDescent) + SHIP_LANE_HEIGHT * i
           ship.direction = random(0, 1) === 0 ? -1 : 1
-          ship.health = SHIP_COLORS.length
+          ship.health = SHIP_COLOURS.length
           ship.speed = shipSpeed
           ship.repaired = 0
           ships.push(ship)
@@ -608,7 +608,7 @@
           repairShip(ship)
           boulder.x = ship.x + BOULDER_X_OFFSET
           boulder.y = ship.y + BOULDER_Y_OFFSET
-          boulder.color = shipColor(ship)
+          boulder.colour = shipColour(ship)
           boulder.speed = random(minSpeed, maxSpeed)
           boulder.live = true
         } else {
@@ -619,7 +619,7 @@
       // Health recovery rules.
       function repairPlayer () {
         const repairy = player.score - player.repairySinceScore
-        if (player.health > 0 && player.health < PLAYER_COLORS.length &&
+        if (player.health > 0 && player.health < PLAYER_COLOURS.length &&
             repairy >= 100) {
           player.health++
           log('increased player health; repairy =', player.score, '-',
@@ -629,7 +629,7 @@
       }
 
       function repairShip (ship) {
-        if (ship.health > 0 && ship.health < SHIP_COLORS.length) {
+        if (ship.health > 0 && ship.health < SHIP_COLOURS.length) {
           ship.repaired++
         }
         if (ship.repaired === 10) {
@@ -669,7 +669,7 @@
         }
         if (player.health > 0 && pulse.y + PULSE_HEIGHT >= PLAYER_Y) {
           pulse.x = player.x + PULSE_X_OFFSET
-          pulse.color = playerColor()
+          pulse.colour = playerColour()
         }
       }
 
@@ -754,13 +754,13 @@
         drawBackground()
 
         let textY = (CANVAS_HEIGHT - 7 * FONT_HEIGHT) / 2
-        drawCenterText(NAME + ' v' + VERSION, textY, false)
+        drawCentreText(NAME + ' v' + VERSION, textY, false)
         textY += 2 * FONT_HEIGHT
-        drawCenterText(COPYRIGHT, textY, false)
+        drawCentreText(COPYRIGHT, textY, false)
         textY += 2 * FONT_HEIGHT
-        drawCenterText(LICENSE, textY, false)
+        drawCentreText(LICENCE, textY, false)
         textY += 2 * FONT_HEIGHT
-        drawCenterText(SOURCE_URL, textY, true)
+        drawCentreText(SOURCE_URL, textY, true)
         urlMinY = textY
         urlMaxY = textY + FONT_HEIGHT
       }
@@ -803,7 +803,7 @@
           if (ship.health <= 0) {
             continue
           }
-          gCtx.fillStyle = shipColor(ship)
+          gCtx.fillStyle = shipColour(ship)
           gCtx.fillRect(
             ship.x + SHIP_ROOF_OFFSET,
             ship.y,
@@ -828,7 +828,7 @@
           if (!boulder.live) {
             continue
           }
-          gCtx.fillStyle = boulder.color
+          gCtx.fillStyle = boulder.colour
           gCtx.fillRect(boulder.x, boulder.y, BOULDER_WIDTH, BOULDER_HEIGHT)
         }
       }
@@ -837,7 +837,7 @@
         if (player.health <= 0) {
           return
         }
-        gCtx.fillStyle = playerColor()
+        gCtx.fillStyle = playerColour()
         gCtx.fillRect(
           player.x + 2 * PLAYER_HEAD_SIZE,
           player.y,
@@ -859,7 +859,7 @@
         if (!pulse.live) {
           return
         }
-        gCtx.fillStyle = pulse.color
+        gCtx.fillStyle = pulse.colour
         gCtx.fillRect(pulse.x, pulse.y, PULSE_WIDTH, PULSE_HEIGHT)
       }
 
@@ -932,13 +932,13 @@
       }
 
       function drawText (line, x, y) {
-        gCtx.fillStyle = PLAYER_COLORS[0]
+        gCtx.fillStyle = PLAYER_COLOURS[0]
         for (let i = 0; i < line.length; i++) {
           drawChar(line.charAt(i), x + i * FONT_WIDTH, y, FONT_SCALE)
         }
       }
 
-      function drawCenterText (text, textY, underline) {
+      function drawCentreText (text, textY, underline) {
         const width = text.length * FONT_WIDTH
         const textX = Math.round((CANVAS_WIDTH - width) / 2)
         drawText(text, textX, textY)
@@ -972,7 +972,7 @@
 
         // If the browser suspends audio when the game starts and a
         // human player pauses and resumes the game, two invocations
-        // of aCtx.resume() callbacks would interleave. The following
+        // of aCtx.resume() callbacks would interleave.  The following
         // clearTimeout() avoids two music loops running
         // simultaneously in such a case.
         clearTimeout(aTimer)
@@ -1036,7 +1036,7 @@
               shipsAlive--
               updateNearestShipAlive()
             }
-            player.score += (SHIP_COLORS.length - ship.health) * 10
+            player.score += (SHIP_COLOURS.length - ship.health) * 10
             log('ship', i, 'is hit')
           }
         }
@@ -1205,7 +1205,7 @@
       }
 
       function moveLeft () {
-        if (state === INITIALIZED) {
+        if (state === INITIALISED) {
           startGame()
           return
         } else if (state !== PLAYING || player.x === PADDING) {
@@ -1217,7 +1217,7 @@
       }
 
       function moveRight () {
-        if (state === INITIALIZED) {
+        if (state === INITIALISED) {
           startGame()
         } else if (state !== PLAYING || player.x === PLAYER_MAX_X) {
           return
@@ -1246,7 +1246,7 @@
 
       function actionPause (e) {
         e.preventDefault()
-        if (state === INITIALIZED) {
+        if (state === INITIALISED) {
           startGame()
         } else if (state === PLAYING) {
           pauseGame()

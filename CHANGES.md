@@ -17,7 +17,7 @@ Changelog
 
 - Autoplay algorithm now aims slightly to the left or the right of the
   centre of the nearest ship to avoid hitting recently released
-  boulders and losing time that could be better utilized for hitting
+  boulders and losing time that could be better utilised for hitting
   the nearest ship.
 
 
@@ -40,9 +40,9 @@ Changelog
 ### Changed
 
 - Autoplay algorithm considers boulder speeds and time to possible
-  impact while scanning airspace and avoiding boulders. This often
+  impact while scanning airspace and avoiding boulders.  This often
   allows the boulders to get closer to the player than it was possible
-  in the previous version while still keeping the player safe. This
+  in the previous version while still keeping the player safe.  This
   allows additional time and more flexibility to the player to move
   around during autoplay.
 - While escaping a boulder directly on top, if the player gets stuck
@@ -101,7 +101,7 @@ Changelog
 
 - Perform pixelated rendering to avoid anti-aliasing.
 - Toggle symbol on play/pause button depending on play/pause state.
-- Play button starts game after a new game is initialized.
+- Play button starts game after a new game is initialised.
 - Draw text using rectangles.
 - Skip playing chords if audio context is suspended.
 - Render score and info text by drawing rectangles.

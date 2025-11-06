@@ -1,7 +1,7 @@
 {
   "name": "invaders",
   "version": "0.9.0",
-  "description": "A 1980s-arcade-style game written using HTML5, Canvas, and Web Audio",
+  "description": "A 1980s-arcade-style game written using HTML5, Canvas and Web Audio",
   "main": "invaders.html",
   "files": [
     "invaders.html"
