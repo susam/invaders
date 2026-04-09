@@ -11,7 +11,7 @@ different from those of Space Invaders.
 
 **[PLAY NOW!][PLAY1]**
 
-[IMG]: https://susam.github.io/blob/img/invaders/invaders-v0.7.1.png
+[IMG]: https://susam.codeberg.page/blob/img/invaders/invaders-v0.7.1.png
 
 
 Contents
@@ -36,14 +36,11 @@ links:
 
 * [susam.net/invaders.html][PLAY1]
 * [susam.github.io/invaders.html][PLAY2]
-
-A testing version of the game with recent bug fixes is available here:
-
-* [susam.github.io/invaders/invaders.html][PLAY3]
+* [susam.codeberg.page/invaders.html][PLAY3]
 
 [PLAY1]: https://susam.net/invaders.html
 [PLAY2]: https://susam.github.io/invaders.html
-[PLAY3]: https://susam.github.io/invaders/invaders.html
+[PLAY3]: https://susam.codeberg.page/invaders.html
 
 There is rudimentary support for playing this game on small screens
 and touchscreens using the buttons provided below the game canvas.
@@ -271,14 +268,6 @@ express or implied.  See [LICENSE.md][L] for details.
 [L]: LICENSE.md
 
 
-Support
--------
-
-To report bugs or ask questions, [create issues][ISSUES].
-
-[ISSUES]: https://github.com/susam/invaders/issues
-
-
 More
 ----
 
@@ -296,14 +285,14 @@ Universal Public Domain Dedication][CC0].  This font is based on the
 
 If you are doing something similar and want the bitmap arrays for a
 larger set of characters, see another project of mine named [PC
-Face](https://github.com/susam/pcface) which offers bitmap arrays for
-all 256 characters of the CP437 character set.
+Face][PCFACE] which offers bitmap arrays for all 256 characters of the
+CP437 character set.
 
 [MDOS]: https://www.dafont.com/modern-dos.font
 [CC0]: https://creativecommons.org/publicdomain/zero/1.0/
 [VGA]: https://int10h.org/oldschool-pc-fonts/fontlist/font?ibm_vga_8x16
 [VERITE]: https://int10h.org/oldschool-pc-fonts/fontlist/font?verite_8x16
-
+[PCFACE]: https://codeberg.org/susam/pcface
 
 <!--
 Release Checklist
@@ -323,5 +312,5 @@ Release Checklist
 - Run: git push origin main $VERSION
 - Run: npm login
 - Run: npm publish
-- Create a new release on GitHub.
+- Create a new release on Codeberg and GitHub.
 -->
